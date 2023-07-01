@@ -7,7 +7,7 @@ Save and load your own graphic presets.
 Either just use the [LotRO_GP.exe](https://github.com/strauss7702/LotRO-Graphic-Preset/releases)  
 (In case you do not trust exe files you can check the file on [Virustotal](https://www.virustotal.com/gui/home/url)
 
-or
+**or**
 
 Download and install [AutoHotkey](https://www.autohotkey.com/)  
 Download [classMemory.ahk](https://github.com/Kalamity/classMemory) and put it in the same folder as LotRO_GP.ahk
