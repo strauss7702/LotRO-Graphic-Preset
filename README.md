@@ -39,7 +39,8 @@ While the actual settings will change, the in game menu [options->graphics/adv g
 <br/><br/>
 <br/><br/>
 
-![1](https://github.com/strauss7702/LotRO-Graphic-Preset/assets/138319390/c495d01f-8750-425e-9984-3088d05920e2)
+![1](https://github.com/strauss7702/LotRO-Graphic-Preset/assets/138319390/c495d01f-8750-425e-9984-3088d05920e2)  
+<br/><br/>
 Almost everything in Adv Graphics  
 ![2](https://github.com/strauss7702/LotRO-Graphic-Preset/assets/138319390/488ed2fe-6a21-4df8-9fb0-b1134712cce0)
 ![3](https://github.com/strauss7702/LotRO-Graphic-Preset/assets/138319390/fbf6aba2-7999-43dd-ba03-f6412927cd52)
