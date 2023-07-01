@@ -210,47 +210,89 @@ IniRead, Maximum_Framerate_Safe_Value, settings.ini, %MyDropdown%, Maximum_Frame
     If (moduleBase="")
         moduleBase := mem.getModuleBaseAddress("lotroclient64.exe")
 
+If Antialiasing_1 IN 0,1,3,7
     mem.write(moduleBase + 0x19800FC, Antialiasing_1, "UInt")
+If Antialiasing_2 IN 0,1,3,7
     mem.write(moduleBase + 0x1DB5DD0, Antialiasing_2, "UInt")
+If Ambient_Light between 0.0 and 1.0
     mem.write(moduleBase + 0x1980A90, Ambient_Light, "UFloat")
+If Brightness between 0.0 and 2.0
     mem.write(moduleBase + 0x1980A88, Brightness, "UFloat")
+If Contrast between 0.0 and 2.0
     mem.write(moduleBase + 0x1980A8C, Contrast, "UFloat")
+If Gamma_Level between 0.0 and 4.4
     mem.write(moduleBase + 0x1980A84, Gamma_Level, "UFloat")
 
+If Object_Draw_Distance IN 0,1,2,3,4
     mem.write(moduleBase + 0x1980A5C, Object_Draw_Distance, "UInt")
+If Model_Detail IN 0,1,2,3,4
     mem.write(moduleBase + 0x1980A50, Model_Detail, "UInt")
+If Material_Detail IN 0,1
     mem.write(moduleBase + 0x1980A4C, Material_Detail, "UInt")
+If Landscape_Draw_Distance IN 0,1,2,3,4
     mem.write(moduleBase + 0x1980A60, Landscape_Draw_Distance, "UInt")
+If Frill_Distance IN 0,1,2,3,4,5
     mem.write(moduleBase + 0x1980A68, Frill_Distance, "UInt")
+If Frill_Density between 0.0 and 1.0
     mem.write(moduleBase + 0x1980A6C, Frill_Density, "UFloat")
+If Distant_Imposters IN 0,1
     mem.write(moduleBase + 0x1980A64, Distant_Imposters, "UInt")
+If Atmospherics_Detail IN 0,1,2
     mem.write(moduleBase + 0x1980ACC, Atmospherics_Detail, "UInt")
+If DX11_Interactive_Water IN 0,1,2,3
     mem.write(moduleBase + 0x1980A80, DX11_Interactive_Water, "UInt")
+If Texture_Detail IN 0,1,2,3,4
     mem.write(moduleBase + 0x1980A48, Texture_Detail, "UInt")
+If Texture_Filtering IN 0,1,2,3,4
     mem.write(moduleBase + 0x1980A34, Texture_Filtering, "UInt")
-    mem.write(moduleBase + 0x1980A38, Anistropic_Filter_Quality, "UInt")
+If Anistropic_Filter_Quality is integer
+    If Anistropic_Filter_Quality between 1 and 16
+        mem.write(moduleBase + 0x1980A38, Anistropic_Filter_Quality, "UInt")
+If High_Quality_Lightning IN 0,1,256,257
     mem.write(moduleBase + 0x1980A94, High_Quality_Lightning, "UInt")
+If Per_Pixel_Lightning_Attenuation IN 0,1,256,257
     mem.write(moduleBase + 0x1980AE4, Per_Pixel_Lightning_Attenuation, "UInt")
+If Specular_Lightning___Player_Mesh_Combining IN 0,1,256,257
     mem.write(moduleBase + 0x1980AD4, Specular_Lightning___Player_Mesh_Combining, "UInt")
+If Surface_Reflections IN 0,1,2,3,4
     mem.write(moduleBase + 0x1980A54, Surface_Reflections, "UInt")
+If Landscape_Lightning_Quality IN 0,1,2
     mem.write(moduleBase + 0x1980A78, Landscape_Lightning_Quality, "UInt")
+If DX10_Distant_Landscape_Lightning___DX11_Ambient_Occlusion___Volumetric_Sun_Lightning IN 0,1,256,257,65536,65537,65792,65793
     mem.write(moduleBase + 0x1980A7C, DX10_Distant_Landscape_Lightning___DX11_Ambient_Occlusion___Volumetric_Sun_Lightning, "UInt")
+If Landscape_Shadows IN 0,1,2,3
     mem.write(moduleBase + 0x1980A74, Landscape_Shadows, "UInt")
+If Blob_Shadows___Environment_Stencil_Shadows IN 0,1,256,257
     mem.write(moduleBase + 0x1980A40, Blob_Shadows___Environment_Stencil_Shadows, "UInt")
+If Stencil_Shadows IN 0,1,2,3,4,5
     mem.write(moduleBase + 0x1980A3C, Stencil_Shadows, "UInt")
+If DX10_Dynamic_Shadows IN 0,1,2
     mem.write(moduleBase + 0x1980A44, DX10_Dynamic_Shadows, "UInt")
+If Dynamic_Particle_Rendering IN 0,1,2,3,4
     mem.write(moduleBase + 0x1980A98, Dynamic_Particle_Rendering, "UInt")
+If Static_Environmental_Objects___Precipitation_Effects___Post_Processing_Effects IN 0,1,256,257,65536,65537,65792,65793
     mem.write(moduleBase + 0x1980A9C, Static_Environmental_Objects___Precipitation_Effects___Post_Processing_Effects, "UInt")
+If Glow_Mapping___Overbright_Bloom_Filter IN 0,1,256,257
     mem.write(moduleBase + 0x1980AC8, Glow_Mapping___Overbright_Bloom_Filter, "UInt")
+If Blur_Filter_Quality IN 0,1,2
     mem.write(moduleBase + 0x1980AD0, Blur_Filter_Quality, "UInt")
+If Bloom_Intensity between 0.0 and 2.0
     mem.write(moduleBase + 0x1980AC4, Bloom_Intensity, "UFloat")
+If Avatar_Update_Visible___Avatar_Texture_Compositing IN 16842752,16842753,16843008,16843009
     mem.write(moduleBase + 0x1980A0C, Avatar_Update_Visible___Avatar_Texture_Compositing, "UInt")
+If 3D_Object_Portraits IN 0,1
     mem.write(moduleBase + 0x1980ADE, 3D_Object_Portraits, "UChar")
+If Texture_Cache_Size between 0.0 and 1.0
     mem.write(moduleBase + 0x1980AE0, Texture_Cache_Size, "UFloat")
+If Player_Crowd_Quality between 0.0 and 2.0
     mem.write(moduleBase + 0x1980AD8, Player_Crowd_Quality, "UFloat")
 
-    mem.write(moduleBase + 0x1DB2EF4, Maximum_Framerate, "UInt")
-    mem.write(moduleBase + 0x19800BC, Maximum_Framerate_Safe_Value, "UInt")
+If Maximum_Framerate is integer
+    If Maximum_Framerate between 0 and 9999
+        mem.write(moduleBase + 0x1DB2EF4, Maximum_Framerate, "UInt")
+If Maximum_Framerate_Safe_Value is integer
+    If Maximum_Framerate_Safe_Value between 0 and 9999
+        mem.write(moduleBase + 0x19800BC, Maximum_Framerate_Safe_Value, "UInt")
 
 Gui, Destroy
 
