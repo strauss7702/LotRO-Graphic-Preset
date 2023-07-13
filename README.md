@@ -24,17 +24,16 @@ Download [classMemory.ahk](https://github.com/Kalamity/classMemory) and put it i
 ### How to use
 - Change the settings in game to your likings, use the save hotkey, name your preset and click ok.
 - Press the load Hotkey, choose a preset and click on ok.  
-![4](https://github.com/strauss7702/LotRO-Graphic-Preset/assets/138319390/33c045de-e6f1-4b97-b401-727fc3b2d228)
+![4](https://github.com/strauss7702/LotRO-Graphic-Preset/assets/138319390/cbb4ac32-e76f-46ad-921a-cfbb4d861b93)
 
 While the actual settings will change, the in game menu [options->graphics/adv graphics/troubleshoot] will not reflect that. If you want to save a preset after you have used the load function of LotRO_GP, go to [options->graphics->overall graphics quality] and click on any option or restart LotRO.
 
 <br/><br/>
 
 ### Tested
-- LotRO Update 36.0.2 - Tuesday June 27, 2023
+- LotRO Update 36.1 - Wednesday July 12, 2023
 - 1920x1080
 - Full Screen (Windowed)
-- Dx11
 
 <br/><br/>
 <br/><br/>
