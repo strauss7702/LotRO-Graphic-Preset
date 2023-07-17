@@ -34,6 +34,7 @@ While the actual settings will change, the in game menu [options->graphics/adv g
 - LotRO Update 36.1 - Wednesday July 12, 2023
 - 1920x1080
 - Full Screen (Windowed)
+- **Antialiasing**, **Avatar Update Visible**, **Avatar Texture Compositing** and/or **Limit FPS** may not work depending on your hardware configuration.
 
 <br/><br/>
 <br/><br/>
