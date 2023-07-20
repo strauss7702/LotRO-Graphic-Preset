@@ -15,19 +15,24 @@ if (_ClassMemory.__Class != "_ClassMemory") {
 process, wait, lotroclient64.exe
 if !(FileExist("settings.ini")) {
     FileAppend,, settings.ini
-    IniWrite, 26745392, Addresses.ini, MemoryAddresses, BaseAddress
 }
-if !(FileExist("Addresses.ini"))
+if !(FileExist("Addresses.ini")) {
     FileAppend,, Addresses.ini
+    IniWrite, 26745392, Addresses.ini, MemoryAddresses, `tBaseAddress
+    LatestPatch:="LotRO Update 36.1 - Wednesday July 12, 2023"
+    IniWrite, %LatestPatch%, Addresses.ini, MemoryAddresses, `tLatestPatch
+    IniWrite, 26745392, Addresses.ini, MemoryAddresses, `tLatestPatchBaseAddress
+}
+
 mem := new _ClassMemory("ahk_exe lotroclient64.exe",, hProcessCopy)
-    if !isObject(mem) 
-        {
-        if (hProcessCopy = 0)
-            MsgBox, 4096, The program isn't running (not found) or you passed an incorrect program identifier parameter. 
-        else if (hProcessCopy = "")
-            MsgBox, 4096, OpenProcess failed. If the target process has admin rights, then the script also needs to be ran as admin. _ClassMemory.setSeDebugPrivilege() may also be required. Consult A_LastError for more information.
-        ExitApp
-        }
+if !isObject(mem) 
+    {
+    if (hProcessCopy = 0)
+        MsgBox, 4096, The program isn't running (not found) or you passed an incorrect program identifier parameter. 
+    else if (hProcessCopy = "")
+        MsgBox, 4096, OpenProcess failed. If the target process has admin rights, then the script also needs to be ran as admin. _ClassMemory.setSeDebugPrivilege() may also be required. Consult A_LastError for more information.
+    ExitApp
+    }
 moduleBase := mem.getModuleBaseAddress("lotroclient64.exe")
 IniRead, AddressBase, Addresses.ini, MemoryAddresses, BaseAddress
 
@@ -66,6 +71,7 @@ AddressData := [["DirectXVersion", 0, "UInt", "IN", "0,1,2"]
                 ,["3D_Object_Portraits", 172, "UInt", "IN", "0,1,65536,65537"]
                 ,["Texture_Cache_Size", 176, "UFloat", "BETWEEN", , "0.0", "1.0"]
                 ,["Per_Pixel_Lightning_Attenuation", 180, "UInt", "IN", "0,1,256,257"]]
+Standby:
 Return
 
 
@@ -114,6 +120,7 @@ ButtonOK:
     Gui, Submit
     WriteValuesToMemory()
     Gui, Destroy
+    WinActivate, ahk_exe lotroclient64.exe
 return
 
 UpdateBaseAddress(){
@@ -129,25 +136,33 @@ UpdateBaseAddress(){
         If (AddressBaseINI != AddressBase) {
             IniWrite, %AddressBase%, Addresses.ini, MemoryAddresses, BaseAddress
             MsgBox, 4096, Updating BaseAddress, Update successful!
+            Reload
+            Sleep 1000
         }
         }
     else
         {
+        Gui, Destroy
         Gui, +OwnDialogs -Caption +LastFound +ToolWindow +AlwaysOnTop
         Gui, Add, Text, , Pattern not found or error: %address% `nPlease open a new issue on GitHub.com
         Gui Add, Button, w90 gOpenGitHub, Open GitHub
         Gui Add, Button, w90 x+10 gCloseGui, Close
         Gui Show, , Window Title
+        Pause
         }
 }
 
 OpenGitHub:
     Run, https://github.com/strauss7702/LotRO-Graphic-Preset/issues/new
     Gui, Destroy
+    Reload
+    Goto Standby
 return
 
 CloseGui:
     Gui, Destroy
+    Reload
+    Goto Standby
 return
 
 CheckValuesInMemory(){
@@ -159,9 +174,8 @@ CheckValuesInMemory(){
             CompareValues:=item[5]
             If ValueInMem not IN %CompareValues%
                 {
-                MsgBox, 4096, Scan Result, One or more of the values could not be found or are incorrect. The script will now attempt to update itself.
+                MsgBox, 4096, Scan Result, One or more of the values could not be found / are incorrect or the Base Address is wrong. The script will now attempt to update itself.
                 UpdateBaseAddress()
-                Return
                 }
             }        
         Else If (item[4]="BETWEEN")
@@ -170,9 +184,8 @@ CheckValuesInMemory(){
             CompareValueMax:=item[7]
             If ValueInMem not between %CompareValueMin% and %CompareValueMax%
                 {
-                MsgBox, 4096, Scan Result, One or more of the values could not be found or are incorrect. The script will now attempt to update itself.
+                MsgBox, 4096, Scan Result, One or more of the values could not be found / are incorrect or the Base Address is wrong. The script will now attempt to update itself.
                 UpdateBaseAddress()
-                Return
                 }
             }
     }
