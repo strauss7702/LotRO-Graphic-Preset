@@ -90,7 +90,9 @@ ExitApp
 #IfWinActive ahk_exe lotroclient64.exe
 
 $!^+c::
-GetCouponCode()
+If (ScriptInitialized!=1)
+    GetBaseAddress()
+GetCouponCode(lotro_window)
 Return
 
 $!^+u::
@@ -152,8 +154,7 @@ $!^+l::
         Return
         }
 Return
-Gui Add, Button, w90 gOpenGitHub, Open GitHub
-Gui Add, Button, w90 x+10 gCloseGui, Close
+
 ButtonSafe:
     Gui, Submit
     Gui, Destroy
@@ -172,7 +173,13 @@ ButtonSafe:
         Gui, Show
     }
     If (notFoundCount < totalValues) {
-        MsgBox, 4096, Safe your Settings, The preset has been saved with the name: %SettingsName%
+        Gui, Destroy
+        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
+        Gui, Add, Text, Center, The preset has been saved with the name: %SettingsName%
+        Gui, Add, Button, gButtonCancel w85, Close
+        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
+        Gui, +Owner%The_Hwnd%
+        Gui, Show
     }
     WinActivate, ahk_exe lotroclient64.exe
 return
@@ -256,20 +263,6 @@ CheckValuesInMemory(writetoINI) {
     }
 }
 
-SafeValuesToINI(){
-    global
-    for index, group in AddressData {
-        for index, item in group {
-            ValueInMem := mem.read(moduleBase + AddressBase + item[2], item[3])
-            Key:=item[1]
-            IniWrite, %ValueInMem%, settings.ini, %SettingsName%, %Key%
-            }
-        }
-    ReformatINI("settings.ini")
-    MsgBox, 4096, Safe your Settings, The preset has been saved with the name: %SettingsName%
-    WinActivate, ahk_exe lotroclient64.exe
-}
-
 WriteValuesToMemory(){
     global
     for index, group in AddressData {
@@ -339,7 +332,7 @@ WM_LBUTTONDOWN(){
 }
 
 ; ----------------------------------------------------------------------------------------------
-GetCouponCode(){
+GetCouponCode(lotro_window){
     WebObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     WebObj.Open("GET", "https://forums.lotro.com/index.php?forums/sales-and-promotions.8/&order=post_date&direction=desc")
     WebObj.Send()
@@ -364,12 +357,22 @@ GetCouponCode(){
         }
         GetTimeLeftAndDate(EndingTime, DateUTCTargetLocal)
         Clipboard:=couponCode
-        MsgBox Coupon Code: %couponCode%`n%description%`n`nExpires in about %EndingTime%`nat %DateUTCTargetLocal%.
-        WinActivate, ahk_exe lotroclient64.exe
+        Gui, Destroy
+        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
+        Gui, Add, Text, , Coupon Code: %couponCode%`n%description%`n`nExpires in about %EndingTime%`nat %DateUTCTargetLocal%.
+        Gui Add, Button, gButtonCancel w90, Close
+        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
+        Gui, +Owner%The_Hwnd%
+        Gui, Show
     }
     else {
-        MsgBox, Newest Coupon Code could not be found.
-        WinActivate, ahk_exe lotroclient64.exe
+        Gui, Destroy
+        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
+        Gui, Add, Text, , Newest Coupon Code could not be found.
+        Gui Add, Button, gButtonCancel w90, Close
+        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
+        Gui, +Owner%The_Hwnd%
+        Gui, Show
     }
 }
 
@@ -407,6 +410,52 @@ ConvertStringToHex(originalString) {
 ToPattern(number){
     return ConvertStringToHex(1BD_1BH(2BD_1BD(number)))
 }
+
+GetTimeLeftAndDate(ByRef EndingTime, ByRef DateUTCTargetLocal){
+    ; Get the current day of the week (1 = Sunday, 2 = Monday, 3 = Tuesday, 4 = Wednesday, 5 = Thursday, 6 = Friday, 7 = Saturday)
+    DateUTCTarget:=A_NowUTC
+    FormatTime, OutputVarDay , %A_NowUTC%, WDay
+    FormatTime, OutputVarHour , %A_NowUTC%, HH
+
+    If (OutputVarDay=5 && OutputVarHour<18)
+        FormatTime, DateUTCTarget , %DateUTCTarget%, yyyyMMdd180000
+
+    Else If ((OutputVarDay!=5) || (OutputVarDay=5 && OutputVarHour>=18)) {
+        DateUTCTarget += 1, Days
+        FormatTime, OutputVarDay , %DateUTCTarget%, WDay
+        While (OutputVarDay!=5) {
+            DateUTCTarget += 1, Days
+            FormatTime, OutputVarDay , %DateUTCTarget%, WDay
+        }
+        FormatTime, DateUTCTarget , %DateUTCTarget%, yyyyMMdd180000
+    }
+
+    EnvSub, DateUTCTarget, A_NowUTC, S
+
+    DateUTCTargetLocal:=A_Now
+    DateUTCTargetLocal += DateUTCTarget, S
+    FormatTime, DateUTCTargetLocal, %DateUTCTargetLocal%,
+
+    EndingTime:=GetFormattedTime(DateUTCTarget)
+}
+
+GetFormattedTime(_seconds){
+    local x, t, ft
+    static units
+ 
+    If (_seconds = 0)
+       Return "Now"
+    units = day.hour.minute
+    Loop Parse, units, .
+    {
+       x := A_Index = 1 ? 24 * 3600 : 60**(4 - A_Index)
+       t := _seconds // x
+       _seconds -= t * x
+       If (t != 0)
+          ft .= t . " " . A_LoopField . (t = 1 ? "" : "s") . (A_Index = 1 ? ", " : "") . (A_Index = 2 ? " and " : "")
+    }
+    Return ft
+ }
 
 GetBaseAddress(){
 global moduleBase:=""
@@ -521,56 +570,11 @@ global ScriptInitialized:=""
         Gui Add, Button, w90 x+10 gCloseGui, Close
         WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
         Gui, +Owner%The_Hwnd%
+        Gui, Show
         Pause
         }
     ScriptInitialized:=1
     SetTimer, CheckGameProcess, 1000
-}
-
-GetTimeLeftAndDate(ByRef EndingTime, ByRef DateUTCTargetLocal){
-    ; Get the current day of the week (1 = Sunday, 2 = Monday, 3 = Tuesday, 4 = Wednesday, 5 = Thursday, 6 = Friday, 7 = Saturday)
-    DateUTCTarget:=A_NowUTC
-    FormatTime, OutputVarDay , %A_NowUTC%, WDay
-    FormatTime, OutputVarHour , %A_NowUTC%, HH
-
-    If (OutputVarDay=5 && OutputVarHour<18)
-        FormatTime, DateUTCTarget , %DateUTCTarget%, yyyyMMdd180000
-
-    Else If ((OutputVarDay!=5) || (OutputVarDay=5 && OutputVarHour>=18)) {
-        DateUTCTarget += 1, Days
-        FormatTime, OutputVarDay , %DateUTCTarget%, WDay
-        While (OutputVarDay!=5) {
-            DateUTCTarget += 1, Days
-            FormatTime, OutputVarDay , %DateUTCTarget%, WDay
-        }
-        FormatTime, DateUTCTarget , %DateUTCTarget%, yyyyMMdd180000
-    }
-
-    EnvSub, DateUTCTarget, A_NowUTC, S
-
-    DateUTCTargetLocal:=A_Now
-    DateUTCTargetLocal += DateUTCTarget, S
-    FormatTime, DateUTCTargetLocal, %DateUTCTargetLocal%,
-
-    EndingTime:=GetFormattedTime(DateUTCTarget)
-}
-
-GetFormattedTime(_seconds){
-   local x, t, ft
-   static units
-
-   If (_seconds = 0)
-      Return "Now"
-   units = day.hour.minute
-   Loop Parse, units, .
-   {
-      x := A_Index = 1 ? 24 * 3600 : 60**(4 - A_Index)
-      t := _seconds // x
-      _seconds -= t * x
-      If (t != 0)
-         ft .= t . " " . A_LoopField . (t = 1 ? "" : "s") . (A_Index = 1 ? ", " : "") . (A_Index = 2 ? " and " : "")
-   }
-   Return ft
 }
 
 CheckGameProcess:
