@@ -109,7 +109,7 @@ $!^+s::
     Gui, +OwnDialogs -Caption +LastFound +ToolWindow
     Gui, Add, Text, Center w175, Name your graphic preset.
     Gui, Add, Edit, Limit w175 vSettingsName
-    Gui, Add, Button, Default gButtonSafe w85, Safe
+    Gui, Add, Button, Default gButtonSave w85, Save
     Gui, Add, Button, gButtonCancel w85 x+5, Cancel
     WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
     Gui, +Owner%The_Hwnd%
@@ -155,7 +155,7 @@ $!^+l::
         }
 Return
 
-ButtonSafe:
+ButtonSave:
     Gui, Submit
     Gui, Destroy
     If (SettingsName="")
