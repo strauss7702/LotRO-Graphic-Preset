@@ -18,7 +18,8 @@ Download [classMemory.ahk](https://github.com/Kalamity/classMemory) and put it i
 - Save: Ctrl + Alt + Shift + S
 - Load: Ctrl + Alt + Shift + L
 - Close: Ctrl + Alt + Shift + END
-- Latest Coupon Code: Ctrl + Alt + Shift + C
+- Latest Coupon Code: Ctrl + Alt + Shift + C  
+![Coupon](https://github.com/strauss7702/LotRO-Graphic-Preset/assets/138319390/3fde27b6-8c64-4401-8218-20f67e88e366)
 
 <br/><br/>
 
@@ -39,7 +40,7 @@ While the actual settings will change, the in game menu [options->graphics/adv g
 ### Todo
 - Combine all elements in one Gui with tabs
 - Reduce to one Hotkey
-- 
+- clean (redundant) code
 
 <br/><br/>
 <br/><br/>
