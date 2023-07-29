@@ -18,10 +18,17 @@ if !(FileExist("settings.ini"))
 if !(FileExist("settings.ini"))
     FileAppend,, settings.ini
 
-GetBaseAddress()
-SetTimer, CheckGameProcess, 1000
-
-AddressData1 := [["DirectXVersion", 2380, "UChar", "IN", "0,1,2"]
+AddressData1 := [["Engine_Speed", -48, "UChar", "IN", "0,1,2,3,4"]
+                ,["Full_Screen_Resolution_Height", 4, "UShort", "BETWEEN", , "180", "8640"]
+                ,["Full_Screen_Resolution_Width", 6, "UShort", "BETWEEN", , "320", "15360"]
+                ,["Windowed_Resolution_Height", 8, "UShort", "BETWEEN", , "180", "8640"]
+                ,["Windowed_Resolution_Width", 10, "UShort", "BETWEEN", , "320", "15360"]
+                ,["Screen_Mode", 12, "UChar", "IN", "0,1,2"]
+                ,["Refresh_Rate", 16, "UShort", "Between", , "0", "999"]
+                ,["Sync_to_Refresh_Rate", 21, "UChar", "IN", "0,1"]
+                ,["Triple_Buffering", 20, "UChar", "IN", "0,1"]
+                ,["Antialiasing", 24, "UChar", "IN", "0,1,3,7"]]
+AddressData2 := [["DirectXVersion", 2380, "UChar", "IN", "0,1,2"]
                 ,["Texture_Filtering", 2384, "UChar", "IN", "0,1,2,3,4"]
                 ,["Anistropic_Filter_Quality", 2388, "UChar", "IN", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16"]
                 ,["Stencil_Shadows", 2392, "UChar", "IN", "0,1,2,3,4,5"]
@@ -31,7 +38,7 @@ AddressData1 := [["DirectXVersion", 2380, "UChar", "IN", "0,1,2"]
                 ,["Texture_Detail", 2404, "UChar", "IN", "0,1,2,3,4"]
                 ,["Material_Detail", 2408, "UChar", "IN", "0,1"]
                 ,["Model_Detail", 2412, "UChar", "IN", "0,1,2,3,4"]]
-AddressData2 := [["Surface_Reflections", 2416, "UChar", "IN", "0,1,2,3,4"]
+AddressData3 := [["Surface_Reflections", 2416, "UChar", "IN", "0,1,2,3,4"]
                 ,["Object_Draw_Distance", 2424, "UChar", "IN", "0,1,2,3,4"]
                 ,["Landscape_Draw_Distance", 2428, "UChar", "IN", "0,1,2,3,4"]
                 ,["Distant_Imposters", 2432, "UChar", "IN", "0,1"]
@@ -41,7 +48,7 @@ AddressData2 := [["Surface_Reflections", 2416, "UChar", "IN", "0,1,2,3,4"]
                 ,["Landscape_Lightning_Quality", 2452, "UChar", "IN", "0,1,2"]
                 ,["DX10_Distant_Landscape_Lightning", 2456, "UChar", "IN", "0,1"]
                 ,["DX11_Ambient_Occlusion", 2457, "UChar", "IN", "0,1"]]
-AddressData3 := [["Volumetric_Sun_Lightning", 2458, "UChar", "IN", "0,1"]
+AddressData4 := [["Volumetric_Sun_Lightning", 2458, "UChar", "IN", "0,1"]
                 ,["DX11_Interactive_Water", 2460, "UChar", "IN", "0,1,2,3"]
                 ,["Gamma_Level", 2464, "UFloat", "BETWEEN", , "0.0", "4.4"]
                 ,["Brightness", 2468, "UFloat", "BETWEEN", , "0.0", "2.0"]
@@ -51,7 +58,7 @@ AddressData3 := [["Volumetric_Sun_Lightning", 2458, "UChar", "IN", "0,1"]
                 ,["Dynamic_Particle_Rendering", 2484, "UChar", "IN", "0,1,2,3,4"]
                 ,["Precipitation_Effects", 2488, "UChar", "IN", "0,1"]
                 ,["Static_Environmental_Objects", 2489, "UChar", "IN", "0,1"]]
-AddressData4 := [["Post_Processing_Effects", 2490, "UChar", "IN", "0,1"]
+AddressData5 := [["Post_Processing_Effects", 2490, "UChar", "IN", "0,1"]
                 ,["Bloom_Intensity", 2528, "UFloat", "BETWEEN", , "0.0", "2.0"]
                 ,["Glow_Mapping", 2532, "UChar", "IN", "0,1"]
                 ,["Overbright_Bloom_Filter", 2533, "UChar", "IN", "0,1"]
@@ -61,41 +68,41 @@ AddressData4 := [["Post_Processing_Effects", 2490, "UChar", "IN", "0,1"]
                 ,["Player_Mesh_Combining", 2545, "UChar", "IN", "0,1"]
                 ,["Player_Crowd_Quality", 2548, "UFloat", "BETWEEN", , "0.0", "2.0"]
                 ,["3D_Object_Portraits", 2554, "UChar", "IN", "0,1"]]
-AddressData5 := [["Texture_Cache_Size", 2556, "UFloat", "BETWEEN", , "0.0", "1.0"]
+AddressData6 := [["Texture_Cache_Size", 2556, "UFloat", "BETWEEN", , "0.0", "1.0"]
                 ,["Per_Pixel_Lightning_Attenuation", 2561, "UChar", "IN", "0,1"]
-                ,["Full_Screen_Resolution_Height", 4, "UShort", "BETWEEN", , "180", "8640"]
-                ,["Full_Screen_Resolution_Width", 6, "UShort", "BETWEEN", , "320", "15360"]
-                ,["Windowed_Resolution_Height", 8, "UShort", "BETWEEN", , "180", "8640"]
-                ,["Windowed_Resolution_Width", 10, "UShort", "BETWEEN", , "320", "15360"]
-                ,["Screen_Mode", 12, "UChar", "IN", "0,1,2"]
-                ,["Antialiasing", 24, "UChar", "IN", "0,1,3,7"]
                 ,["Maximum_Frame_Rate", 4402800, "UShort", "BETWEEN", , "0", "1000"]
                 ,["Avatar_Texture_Compositing", 4468360, "UChar", "IN", "0,1"]
                 ,["Avatar_Update_Visible", 4468361, "UChar", "IN", "0,1"]
                 ,["PvMP_Performance_Override", 4468363, "UChar", "IN", "0,1"]]
+
 AddressData := []
 AddressData.Push(AddressData1)
 AddressData.Push(AddressData2)
 AddressData.Push(AddressData3)
 AddressData.Push(AddressData4)
 AddressData.Push(AddressData5)
+AddressData.Push(AddressData6)
 Return
 
-#IfWinActive ahk_exe lotroclient64.exe
 $!^+End::
 ExitApp
+
+#IfWinActive ahk_exe lotroclient64.exe
 
 $!^+c::
 GetCouponCode()
 Return
 
 $!^+u::
-; GetBaseAddress()
-CheckValuesInMemory(0)
-MsgBox, 4160, Scan Result, % notFoundCount " out of " totalValues " values could not be found / are incorrect or the Base Address is wrong.`n`nThe following values could not be found:`n" RegExReplace(LTrim(valuesNotFound, "`n"), "_", " ")
+    ; If (ScriptInitialized!=1)
+    ;     GetBaseAddress()
+    CheckValuesInMemory(0)
+    MsgBox, 4160, Scan Result, % notFoundCount " out of " totalValues " values could not be found / are incorrect or the Base Address is wrong.`n`nThe following values could not be found:`n" RegExReplace(LTrim(valuesNotFound, "`n"), "_", " ")
 Return
 
 $!^+s::
+    If (ScriptInitialized!=1)
+        GetBaseAddress()
     Gui, Destroy
     Gui, +OwnDialogs -Caption +LastFound +ToolWindow
     Gui, Add, Text, Center w175, Name your graphic preset.
@@ -108,6 +115,8 @@ $!^+s::
 Return
 
 $!^+l::
+    If (ScriptInitialized!=1)
+        GetBaseAddress()
     DropDownSelectionINI:=
     IniRead, OutputVarSectionNames, settings.ini
     SectionNames := StrSplit(OutputVarSectionNames, "`n")
@@ -405,6 +414,7 @@ global AddressBase:=""
 global mem:=""
 global moduleBase:=""
 global lotro_window:=""
+global ScriptInitialized:=""
 
     Process, Exist, lotroclient64.exe
     If !Errorlevel {
@@ -513,6 +523,8 @@ global lotro_window:=""
         Gui, +Owner%The_Hwnd%
         Pause
         }
+    ScriptInitialized:=1
+    SetTimer, CheckGameProcess, 1000
 }
 
 GetTimeLeftAndDate(ByRef EndingTime, ByRef DateUTCTargetLocal){
@@ -543,8 +555,7 @@ GetTimeLeftAndDate(ByRef EndingTime, ByRef DateUTCTargetLocal){
     EndingTime:=GetFormattedTime(DateUTCTarget)
 }
 
-GetFormattedTime(_seconds)
-{
+GetFormattedTime(_seconds){
    local x, t, ft
    static units
 
