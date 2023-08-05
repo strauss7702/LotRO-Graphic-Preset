@@ -33,7 +33,7 @@ While the actual settings will change, the in game menu [options->graphics/adv g
 <br/><br/>
 
 ### Tested
-- LotRO Update 36.1 - Wednesday July 12, 2023
+- LotRO Update 36.2 - Wednesday August 2, 2023
 - Windows 10 22H2
 - 64-bit Client
 
