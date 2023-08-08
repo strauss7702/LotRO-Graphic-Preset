@@ -2,14 +2,15 @@
 SetWorkingDir %A_ScriptDir%
 #SingleInstance Force
 #Include classMemory.ahk        ; https://github.com/Kalamity/classMemory
-OnMessage(0x201, "WM_LBUTTONDOWN")
+OnExit("Cleanup")
+OnMessage(0x0201, "WM_LBUTTONDOWN")
 
 if !A_IsAdmin {
     Run *RunAs "%A_ScriptFullPath%"
-    exitapp 
+    exitapp
 }
 if (_ClassMemory.__Class != "_ClassMemory") {
-    MsgBox, 4096, class memory not correctly installed. 
+    MsgBox, 4096,, class memory not correctly installed. 
     ExitApp
 }
 
@@ -82,125 +83,103 @@ AddressData.Push(AddressData3)
 AddressData.Push(AddressData4)
 AddressData.Push(AddressData5)
 AddressData.Push(AddressData6)
+
+process, wait, lotroclient64.exe
+
+mem := new _ClassMemory("ahk_exe lotroclient64.exe",, hProcessCopy)
+if !isObject(mem) 
+    {
+    if (hProcessCopy = 0)
+        MsgBox, 4096,, The program isn't running (not found) or you passed an incorrect program identifier parameter. 
+    else if (hProcessCopy = "")
+        MsgBox, 4096, OpenProcess failed, If the target process has admin rights, then the script also needs to be ran as admin. _ClassMemory.setSeDebugPrivilege() may also be required. Consult A_LastError for more information.
+    ExitApp
+    }
+moduleBase := mem.getModuleBaseAddress("lotroclient64.exe")
+
+Progress, b w200,, My LotRO Buddy,
+Progress, 30
+Loop
+    {
+    aPattern := [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, "?", "?", 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x34, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0xC1, 0x00, 0x00, 0xC0, 0x40]
+    ; FoV_address := mem.modulePatternScan("lotroclient64.exe", aPattern*)
+    FoV_address := mem.processPatternScan(,, aPattern*)
+    If (A_Index >= 10) {
+        Progress, Off
+        MsgBox, Pause Here 1
+        Gui, +OwnDialogs -Caption +LastFound +ToolWindow +AlwaysOnTop
+        Gui, Add, Text, , Pattern not found or error: %address% `nPlease open a new issue on GitHub.com
+        Gui Add, Button, w90 gOpenGitHub, Open GitHub
+        Gui Add, Button, w90 x+10 gCloseGui, Close
+        Gui, Show
+        Pause
+    }
+    VarProgress := 30 + 3 * A_Index
+    Progress, %VarProgress%
+    }until (FoV_address>0)
+FoV_AddressBase := FoV_address - moduleBase + 16
+FoV_Factor_ValueInMem := mem.read(FoV_AddressBase + modulebase, "UFloat")
+Progress, 80
+GetBaseAddress()
+Progress, 100
+Sleep 500
+Progress, Off
+CreateGui()
+ScriptStatus:=1
 Return
 
-$!^+End::
-ExitApp
 
-#IfWinActive ahk_exe lotroclient64.exe
 
-$!^+c::
-If (ScriptInitialized!=1)
-    GetBaseAddress()
-GetCouponCode(lotro_window)
-Return
-
-$!^+u::
-    ; If (ScriptInitialized!=1)
-    ;     GetBaseAddress()
-    CheckValuesInMemory(0)
-    MsgBox, 4160, Scan Result, % notFoundCount " out of " totalValues " values could not be found / are incorrect or the Base Address is wrong.`n`nThe following values could not be found:`n" RegExReplace(LTrim(valuesNotFound, "`n"), "_", " ")
-Return
-
-$!^+s::
-    If (ScriptInitialized!=1)
-        GetBaseAddress()
-    Gui, Destroy
-    Gui, +OwnDialogs -Caption +LastFound +ToolWindow
-    Gui, Add, Text, Center w175, Name your graphic preset.
-    Gui, Add, Edit, Limit w175 vSettingsName
-    Gui, Add, Button, Default gButtonSave w85, Save
-    Gui, Add, Button, gButtonCancel w85 x+5, Cancel
-    WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
-    Gui, +Owner%The_Hwnd%
+$Pause::
+if (WinExist("ahk_id " My_LotRO_Buddy_Hwnd))
+    Gui, Hide
+else
     Gui, Show
 Return
 
-$!^+l::
-    If (ScriptInitialized!=1)
-        GetBaseAddress()
-    DropDownSelectionINI:=
-    IniRead, OutputVarSectionNames, settings.ini
-    SectionNames := StrSplit(OutputVarSectionNames, "`n")
-    For Key, Value in SectionNames
-        {
-            If (Value="MemoryAddresses")
-                Continue
-            Else If (DropDownSelectionINI="")
-                DropDownSelectionINI:=Value "|"
-            Else If (DropDownSelectionINI!="")
-                DropDownSelectionINI:=DropDownSelectionINI "|" Value
-        }
-    If (DropDownSelectionINI!=""){
-        Gui, Destroy
-        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
-        Gui, Add, Text, Center, Which preset would you like to load?
-        Gui, Add, DropDownList, vMyDropdown w175, %DropDownSelectionINI%
-        Gui, Add, Button, Default gButtonLoad w85, Load
-        Gui, Add, Button, gButtonCancel w85 x+5, Cancel
-        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
-        Gui, +Owner%The_Hwnd%
-        Gui, Show
-    }
-    Else
-        {
-        Gui, Destroy
-        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
-        Gui, Add, Text, Center, No presets have been saved yet.
-        Gui, Add, Button, gButtonCancel w85 x46, Close
-        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
-        Gui, +Owner%The_Hwnd%
-        Gui, Show
-        Return
-        }
-Return
+#IfWinActive ahk_exe lotroclient64.exe
 
 ButtonSave:
     Gui, Submit
-    Gui, Destroy
     If (SettingsName="")
         Return
     CheckValuesInMemory(1)
     ReformatINI("settings.ini")
     If (notFoundCount > 0) {
-        Gui, Destroy
-        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
-        Gui, Add, Text, Center, % notFoundCount " out of " totalValues " values could not be found / are incorrect and will not be saved.`n`nThe following values could not be found:`n" RegExReplace(LTrim(valuesNotFound, "`n"), "_", " ")"`n`nYou can either close and continue without the missing values or open GitHub to report the issue."
-        Gui, Add, Button, gCloseGui w85 x46, Close
-        Gui, Add, Button, gOpenGitHub w85 x46, Open GitHub
-        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
-        Gui, +Owner%The_Hwnd%
-        Gui, Show
+        MsgBox, 4160, Error, % notFoundCount " out of " totalValues " values could not be found / are incorrect and will not be saved.`n`nThe following values could not be found:`n" RegExReplace(LTrim(valuesNotFound, "`n"), "_", " ")"`n`nYou can either close and continue without the missing values or open GitHub to report the issue."
     }
-    If (notFoundCount < totalValues) {
-        Gui, Destroy
-        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
-        Gui, Add, Text, Center, The preset has been saved with the name: %SettingsName%
-        Gui, Add, Button, gButtonCancel w85, Close
-        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
-        Gui, +Owner%The_Hwnd%
-        Gui, Show
-    }
-    WinActivate, ahk_exe lotroclient64.exe
+    UpdatePresetList()
+    GuiControl,, SettingsName,
+    ; WinActivate, ahk_exe lotroclient64.exe
+    Gui, Show
 return
 
 ButtonLoad:
-    Gui, Submit
+    Gui, Submit, NoHide
+    If (MyDropdown="")
+        Return
     CheckValuesInMemory(0)
     WriteValuesToMemory()
-    Gui, Destroy
-    WinActivate, ahk_exe lotroclient64.exe
+    ; WinActivate, ahk_exe lotroclient64.exe
+    Gui, Show
 return
 
-ButtonCancel:
-    Gui, Destroy
-    WinActivate, ahk_exe lotroclient64.exe
-return
+ButtonDelete:
+    Gui, Submit, NoHide
+    MSGBox, 4100,, Do you want to delete the preset %MyDropdown%?
+    IfMsgBox, No 
+      Return
+    IniDelete, settings.ini, %MyDropdown%
+    UpdatePresetList()
+Return
 
-ButtonCloseApp:
-    Gui, Destroy
-    ExitApp
-return
+ButtonReset:
+    mem.write(moduleBase + FoV_AddressBase, 45, "UFloat")
+    WinGetPos, OutX, OutY, OutWidth, OutHeight, ahk_pid %lotro_window%
+    FoVRead := (OutWidth / OutHeight) * 45
+    GuiControl,, VarFoVEdit, % Round(FoVRead)
+    GuiControl,, VarFoVSlider, % Round(FoVRead)
+Return
 
 OpenGitHub:
     Run, https://github.com/strauss7702/LotRO-Graphic-Preset/issues/new
@@ -269,7 +248,7 @@ WriteValuesToMemory(){
         for index, item in group {
             Key := item[1]
             IniRead, Value_INI, settings.ini, %MyDropdown%, %Key%
-            If (Value_INI!="Value not found" && Value_INI!="" && Value_INI!="ERROR")
+            If (Value_INI!="Value not found" && Value_INI!="" && Value_INI!="ERROR")    ; if Value_INI not in ,Value not found,ERROR
                 mem.write(moduleBase + AddressBase + item[2], Value_INI, item[3])
         }
     }
@@ -292,47 +271,8 @@ ReformatINI(filename){
     FileAppend, %FormattedContent%, %filename%
 }
 
-
-; -----------------------------------------------------------------------------------------
-; -----------------------------------------------------------------------------------------
-; -----------------------------------------------------------------------------------------
-; -----------------------------------------------------------------------------------------
-; -----------------------------------------------------------------------------------------
-; -----------------------------------------------------------------------------------------
-; -----------------------------------------------------------------------------------------
-; -----------------------------------------------------------------------------------------
-
-; Gui, +LastFound -Caption +ToolWindow
-; Gui, Add, Tab2,, Graphic|Coupon|Placeholder
-
-; Gui, Tab, 2
-; Gui, Add, Text,, Receiving the latest Coupon Code
-; Gui, Add, Progress, w200 h20 cBlue vMyProgress, 10
-; Gui, Add, Text, vCouponCode w200, Coupon Code: `n
-
-; Gui, Tab, 3
-; Gui, Add, Edit, vMyEdit r5  ; r5 means 5 rows tall.
-; Gui, Tab  ; i.e. subsequently-added controls will not belong to the tab control.
-; Gui, Add, Button, default xm, OK  ; xm puts it at the bottom left corner.
-; Gui, Show
-; GuiControl, Hide, MyProgress
-; GuiControl, Hide, CouponCode
-; return
-
-; ButtonOK:
-; GuiClose:
-; GuiEscape:
-; Gui, Submit  ; Save each control's contents to its associated variable.
-; MsgBox You entered:`n%MyCheckbox%`n%MyRadio%`n%MyEdit%
-; ExitApp
-
-WM_LBUTTONDOWN(){
-    Global
-        PostMessage 0xA1, 2
-}
-
-; ----------------------------------------------------------------------------------------------
 GetCouponCode(lotro_window){
+    global VarCouponText
     WebObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     WebObj.Open("GET", "https://forums.lotro.com/index.php?forums/sales-and-promotions.8/&order=post_date&direction=desc")
     WebObj.Send()
@@ -357,26 +297,12 @@ GetCouponCode(lotro_window){
         }
         GetTimeLeftAndDate(EndingTime, DateUTCTargetLocal)
         Clipboard:=couponCode
-        Gui, Destroy
-        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
-        Gui, Add, Text, , Coupon Code: %couponCode%`n%description%`n`nExpires in about %EndingTime%`nat %DateUTCTargetLocal%.
-        Gui Add, Button, gButtonCancel w90, Close
-        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
-        Gui, +Owner%The_Hwnd%
-        Gui, Show
+        GuiControl,, VarCouponText, Coupon Code: %couponCode%`n%description%`n`nExpires in about %EndingTime%`nat %DateUTCTargetLocal%.
     }
     else {
-        Gui, Destroy
-        Gui, +OwnDialogs -Caption +LastFound +ToolWindow
-        Gui, Add, Text, , Newest Coupon Code could not be found.
-        Gui Add, Button, gButtonCancel w90, Close
-        WinGet, The_Hwnd , ID, ahk_pid %lotro_window%
-        Gui, +Owner%The_Hwnd%
-        Gui, Show
+        GuiControl,, VarCouponText, Newest Coupon Code could not be found.
     }
 }
-
-;---------------------------------------------------------------------------------------------
 
 ;Convert 2 Byte Decimal to 1 byte Decimal
 2BD_1BD(number){
@@ -435,6 +361,7 @@ GetTimeLeftAndDate(ByRef EndingTime, ByRef DateUTCTargetLocal){
     DateUTCTargetLocal:=A_Now
     DateUTCTargetLocal += DateUTCTarget, S
     FormatTime, DateUTCTargetLocal, %DateUTCTargetLocal%,
+    ; FormatTime, DateUTCTargetLocal, %DateUTCTargetLocal%, hh:mm 'pm, August' dd, yyyy
 
     EndingTime:=GetFormattedTime(DateUTCTarget)
 }
@@ -458,33 +385,10 @@ GetFormattedTime(_seconds){
  }
 
 GetBaseAddress(){
-global moduleBase:=""
+global moduleBase
 global AddressBase:=""
-global mem:=""
-global moduleBase:=""
+global mem
 global lotro_window:=""
-global ScriptInitialized:=""
-
-    Process, Exist, lotroclient64.exe
-    If !Errorlevel {
-        Gui, +OwnDialogs -Caption +LastFound +ToolWindow +AlwaysOnTop
-        Gui, Add, Text, Center w175, Waiting for game window (64 bit).
-        Gui Add, Button, w90 x52 gButtonCloseApp, Close App
-        Gui, Show
-        process, wait, lotroclient64.exe
-        Gui, Destroy
-    }
-
-    mem := new _ClassMemory("ahk_exe lotroclient64.exe",, hProcessCopy)
-    if !isObject(mem) 
-        {
-        if (hProcessCopy = 0)
-            MsgBox, 4096, The program isn't running (not found) or you passed an incorrect program identifier parameter. 
-        else if (hProcessCopy = "")
-            MsgBox, 4096, OpenProcess failed. If the target process has admin rights, then the script also needs to be ran as admin. _ClassMemory.setSeDebugPrivilege() may also be required. Consult A_LastError for more information.
-        ExitApp
-        }
-    moduleBase := mem.getModuleBaseAddress("lotroclient64.exe")
 
     WinGet, lotro_window, PID, ahk_exe lotroclient64.exe
     WinGetPos, OutX, OutY, OutWidth, OutHeight, ahk_pid %lotro_window%
@@ -496,12 +400,10 @@ global ScriptInitialized:=""
 
     SysGet, MonitorCount, MonitorCount
     MonitorResolution := ""
-    MonitorPosition := ""
     Loop, %MonitorCount% {
         SysGet, Monitor, Monitor, %A_Index%
         if (OutX >= MonitorLeft && OutX <= MonitorRight && OutY >= MonitorTop && OutY <= MonitorBottom) {
             MonitorResolution := MonitorRight - MonitorLeft "x" MonitorBottom - MonitorTop
-            MonitorPosition := "on Monitor " A_Index
             break
         }
     }
@@ -512,7 +414,7 @@ global ScriptInitialized:=""
     tokens := StrSplit(ToPattern(OutWidth), " ")
     OutWidth1 := "0x" . tokens[1]
     OutWidth2 := "0x" . tokens[2]
-
+    address:=""
     ; Check if the window resolution matches the monitor resolution
     if (OutWidth = MonitorRight - MonitorLeft && OutHeight = MonitorBottom - MonitorTop) {
             aPattern := [0x00, 0x00, 0x80, 0x3F, OutHeight1, OutHeight2, OutWidth1, OutWidth2, "?", "?", "?", "?", 0x02, 0x00]
@@ -535,21 +437,17 @@ global ScriptInitialized:=""
         If (AddressBaseINI != AddressBase) {
             IniWrite, %AddressBase%, settings.ini, MemoryAddresses, BaseAddress
             IniWrite, %moduleBase%, settings.ini, MemoryAddresses, ModuleBase
-
             WebObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
             WebObj.Open("GET", "https://www.lotro.com/home/update-notes")
             WebObj.Send()
             HtmlText := WebObj.ResponseText
             if (RegExMatch(HtmlText, "Update (\d+(?:\.\d+)*), released on (.*?),[^.</p>]*", LatestUpdate)){
+                LatestUpdateNumber := ""
+                LatestUpdateReleaseDate := ""
                 if (RegExMatch(LatestUpdate, "Update (\d+(?:\.\d+)*)", versionMatch))
                     LatestUpdateNumber := versionMatch1
-                else
-                    LatestUpdateNumber := ""
                 if (RegExMatch(LatestUpdate, "released on (.+)", dateMatch))
                     LatestUpdateReleaseDate := dateMatch1
-                else
-                    LatestUpdateReleaseDate := ""
-        
                 IniWrite, %LatestUpdateNumber%, settings.ini, MemoryAddresses, LatestUpdateNumber
                 IniWrite, %LatestUpdateReleaseDate%, settings.ini, MemoryAddresses, LatestUpdateReleaseDate
             }
@@ -563,6 +461,7 @@ global ScriptInitialized:=""
         }
     else
         {
+        Progress, Off
         Gui, Destroy
         Gui, +OwnDialogs -Caption +LastFound +ToolWindow
         Gui, Add, Text, , Pattern not found or error: %address% `nPlease open a new issue on GitHub.com
@@ -573,12 +472,119 @@ global ScriptInitialized:=""
         Gui, Show
         Pause
         }
-    ScriptInitialized:=1
     SetTimer, CheckGameProcess, 1000
 }
 
 CheckGameProcess:
 Process, Exist, lotroclient64.exe
-    If !Errorlevel
+    If (Errorlevel=0)
         Reload
 Return
+
+UpdatePresetList(){
+    Global
+    DropDownSelectionINI:=""
+    IniRead, OutputVarSectionNames, settings.ini
+    SectionNames := StrSplit(OutputVarSectionNames, "`n")
+    For Key, Value in SectionNames
+        {
+            If (Value="MemoryAddresses")
+                Continue
+            Else If (DropDownSelectionINI="")
+                DropDownSelectionINI:=Value "||"
+            Else If (DropDownSelectionINI!="")
+                DropDownSelectionINI:=DropDownSelectionINI Value "|"
+        }
+    GuiControl,, MyDropdown, |%DropDownSelectionINI%
+}
+
+CreateGui(){
+    global
+    Gui, +OwnDialogs +LastFound -Caption +ToolWindow +HwndMy_LotRO_Buddy_Hwnd
+    Gui, Margin,0,0
+
+    Gui Add, Progress, x1 y1 w298 h11 Background1A3461
+    Gui Add, Progress, x1 y12 w298 h11 Background000A26
+    Gui Add, Progress, x0 y0 w1 h12 Background4A5C7F
+    Gui Add, Progress, x0 y12 w1 h12 Background363E54
+    Gui Add, Progress, x299 y0 w1 h12 Background1A2843
+    Gui Add, Progress, x299 y12 w1 h12 Background000618
+    Gui Add, Progress, x0 y0 w300 h1 Background7B8DA9
+    Gui Add, Progress, x0 y23 w300 h1 Background00030C
+    Gui, Font, s14 cF5DF92
+    Gui, Add, Text, x0 y0 w300 h24 Center BackgroundTrans, My LotRO Buddy
+    Gui, Font
+    Gui, Add, Tab3, x0 y25 w300 h200 0x400 Buttons Border vVarMyTabs gMyTabs,Graphic|FoV|Coupon
+    Gui, Tab, 1
+    Gui, Add, GroupBox, x3 y55 w183 h70 Center, Save Preset
+    Gui, Add, Edit, Limit w175 x7 y75 vSettingsName,
+    Gui, Add, Button, x45 y+0 gButtonSave w85, Save
+
+    If (DropDownSelectionINI="")
+        UpdatePresetList()
+    Gui, Add, GroupBox, x3 ym+130 w183 h70 Center, Load Preset
+    Gui, Add, DropDownList, x7 ym+150 vMyDropdown w175, %DropDownSelectionINI%
+    Gui, Add, Button, x6 y+0 gButtonLoad w85, Load
+    Gui, Add, Button, x98 yp+0 gButtonDelete w85, Delete
+
+    Gui, Tab, 2
+    Gui, Add, Text, x7 y57 0x800000 vFoVText Center, `nChange your field of view.`nFirst Person not supported at the moment.`n
+    FoV_Factor_ValueInMem := mem.read(FoV_AddressBase + modulebase, "UFloat")
+    WinGetPos, OutX, OutY, OutWidth, OutHeight, ahk_pid %lotro_window%
+    FoVRead := (OutWidth / OutHeight) * FoV_Factor_ValueInMem
+    Gui, Add, Slider, y+10 vVarFoVSlider gFoVSlider AltSubmit Range40-200, % Round(FoVRead)
+    Gui, Add, Edit, vVarFoVEdit w50 x+5 Center ReadOnly, % Round(FoVRead)        ; w30
+    Gui, Add, UpDown, Range40-200 vVarFoVUpDown gFoVUpDown, % Round(FoVRead)
+    Gui, Add, Button, x+0 yp-1 w44 vVarButtonReset gButtonReset, Reset
+
+    Gui, Tab, 3
+    Gui, Add, Text, x7 y57 w300 h80 vVarCouponText,
+    Gui, Add, Button, x7 y150 w85 vVarGetCode gGetCode, Get Code
+
+    WinGet, lotro_window_Hwnd , ID, ahk_pid %lotro_window%
+    Gui, +Owner%lotro_window_Hwnd%
+    Gui, Show, w300 h200
+    WinActivate, ahk_exe lotroclient64.exe
+}
+FoVSlider(){
+    global
+    FoV_Write := (VarFoVSlider * OutHeight) / OutWidth
+    GuiControl,, VarFoVEdit, % Round(VarFoVSlider)
+    mem.write(moduleBase + FoV_AddressBase, FoV_Write, "UFloat")
+}
+FoVUpDown(){
+    global
+    GuiControl, Disable, VarFoVEdit
+    FoV_Write := (VarFoVUpDown * OutHeight) / OutWidth
+    GuiControl,, VarFoVSlider, % Round(VarFoVUpDown)
+    mem.write(moduleBase + FoV_AddressBase, FoV_Write, "UFloat")
+    GuiControl, Enable, VarFoVEdit
+}
+GetCode(){
+    global
+    GuiControl,, VarCouponText, `n`nRetrieving the latest Coupon Code.`nThis may take a moment...
+    Sleep 5
+    GetCouponCode(lotro_window)
+}
+MyTabs(){
+    global
+    Gui, Submit, NoHide
+    If (VarMyTabs="FoV") {
+        FoV_Factor_ValueInMem := mem.read(FoV_AddressBase + modulebase, "UFloat")
+        WinGetPos, OutX, OutY, OutWidth, OutHeight, ahk_pid %lotro_window%
+        FoVRead := (OutWidth / OutHeight) * FoV_Factor_ValueInMem
+        GuiControl,, VarFoVEdit, % Round(FoVRead)
+        GuiControl,, VarFoVSlider, % Round(FoVRead)
+        Sleep 5
+    }
+}
+
+WM_LBUTTONDOWN(){
+    PostMessage, 0x00A1, 2
+}
+
+Cleanup(){
+    global
+    If (ScriptStatus=1)
+        mem.write(moduleBase + FoV_AddressBase, 45, "UFloat")
+}
