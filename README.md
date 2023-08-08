@@ -1,9 +1,4 @@
-# LotRO-Graphic-Preset
-Save and load your own graphic presets.
-
-<br/><br/>
-
-### Requirements
+## Requirements
 Either just use the [My_LotRO_Buddy.exe](https://github.com/strauss7702/My_LotRO_Buddy/releases)  
 _In case you do not trust exe files you can check the file on [Virustotal](https://www.virustotal.com/gui/home/url)_
 
@@ -14,12 +9,12 @@ Download [classMemory.ahk](https://github.com/Kalamity/classMemory) and put it i
 
 <br/><br/>
 
-### Hotkey
+## Hotkey
 [Pause / Break]   [Because it is one of the keys that is not assigned by default.](https://lotro-wiki.com/index.php/User:Taz/Scratchpad-Commands)  
 
 <br/><br/>
 
-### Features
+## Features
 ![MLB_1](https://github.com/strauss7702/My_LotRO_Buddy/assets/138319390/62c0e08b-4b62-4900-8644-9de55dc2fd34)
 ![MLB_2](https://github.com/strauss7702/My_LotRO_Buddy/assets/138319390/d3ceda71-08d5-4a10-bf0d-66e7e2822cc1)
 ![MLB_3](https://github.com/strauss7702/My_LotRO_Buddy/assets/138319390/c8795e1c-9121-4464-947d-535c64ce9379)
@@ -28,7 +23,7 @@ While the actual settings will change when you load a preset, the in game menu [
 
 <br/><br/>
 
-### What is saved?
+## What is saved?
 Everything in **Graphics**, **Adv Graphics** and **Troubleshoot**.  
 ![options](https://github.com/strauss7702/My_LotRO_Buddy/assets/138319390/1da8b7f8-39bb-48fc-89de-b015a9a235f1)  
 
