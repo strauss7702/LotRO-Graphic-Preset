@@ -40,7 +40,7 @@ Progress, 10
 Progress,, Game Client found.
 Loop
     {
-    aPattern := [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, "?", "?", 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, "?", "?", 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0xC1, 0x00, 0x00, 0xC0, 0x40]
+    aPattern := [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, "?", "?", 0x00, 0x00, 0x00, 0x00, "?", "?", "?", "?", 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0xC1, 0x00, 0x00, 0xC0, 0x40]
     FoV_address := mem.processPatternScan(,, aPattern*)
     If (A_Index >= 10) {
         Progress, Off
@@ -68,10 +68,11 @@ Loop {
     ox:=mem.read(FoV_AddressBase + 0xC8, "UFloat")
     oy:=mem.read(FoV_AddressBase + 0xCC, "UFloat")
     oz:=mem.read(FoV_AddressBase + 0xD0, "UFloat")
-    RegionNumber1 := mem.read(AddressBase + moduleBase + 0x2764, "UChar")
-    RegionNumber2 := mem.read(AddressBase + moduleBase + 0x3FDC, "UChar")
-    Sleep 100
-}until ((ox!="" && oy!="" && oz!="") && (ox!=0 || oy!=0 || oz!=0) && (RegionNumber1=0 RegionNumber2!=0))
+    ClientRunTime1:=mem.read(FoV_AddressBase + 0x70, "Double")
+    ClientRunTime2:=mem.read(FoV_AddressBase + 0x140, "Double")
+    RegionNumber1 := mem.read(AddressBase + moduleBase + 0x40EC, "UChar")
+    Sleep 1000
+}until ((ox!="" && oy!="" && oz!="") && (ox!=0 || oy!=0 || oz!=0) && RegionNumber1!=0 && ClientRunTime1=ClientRunTime2)
     Loop
         {
         Progress,,`nDo not move Character or Camera.
@@ -103,66 +104,59 @@ Loop {
         heading22:= "0x" . Format("{:02X}",mem.read(FoV_AddressBase + 0xE1, "UChar"))
         heading23:= "0x" . Format("{:02X}",mem.read(FoV_AddressBase + 0xE2, "UChar"))
         heading24:= "0x" . Format("{:02X}",mem.read(FoV_AddressBase + 0xE3, "UChar"))
+If (heading21=0 && heading22=0 && heading23=0 && heading24=0)
+    heading24:=0x80
 
-        RegionNumber := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FDC, "UChar"))
-        RN1 := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FD4, "UChar"))
-        RN2 := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FD5, "UChar"))
-        RN3 := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FD6, "UChar"))
-        RN4 := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FD7, "UChar"))
-        RN5 := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FD8, "UChar"))
-        RN6 := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FD9, "UChar"))
-        RN7 := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FDA, "UChar"))
-        RN8 := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x3FDB, "UChar"))
+        RegionNumber := "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x40EC, "UChar"))
 
-        vx2:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x2774, "UChar"))
-        vx3:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x2775, "UChar"))
-        vx4:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x2776, "UChar"))
-        vy2:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x2778, "UChar"))
-        vy3:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x2779, "UChar"))
-        vy4:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x277A, "UChar"))
-        vz2:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x277C, "UChar"))
-        vz3:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x277D, "UChar"))
-        vz4:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x277E, "UChar"))
+        vx1:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27F4, "UChar"))
+        vx2:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27F5, "UChar"))
+        vx3:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27F6, "UChar"))
+        vx4:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27F7, "UChar"))
+        vy1:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27F8, "UChar"))
+        vy2:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27F9, "UChar"))
+        vy3:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27FA, "UChar"))
+        vy4:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27FB, "UChar"))
+        vz1:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27FC, "UChar"))
+        vz2:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27FD, "UChar"))
+        vz3:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27FE, "UChar"))
+        vz4:= "0x" . Format("{:02X}",mem.read(AddressBase + moduleBase + 0x27FF, "UChar"))
         
 
-
-        If (Acceleration_address!>0){
-            Progress,,Coordinates`nDo not move Character or Camera.
-             aPattern := [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, RN1, RN2, RN3, RN4, RN5, RN6, RN7, RN8
-                        ,0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-                        ,0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3F
-                        ,0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, "?", "?", "?", "?"
-                        ,RN1, RN2, RN3, RN4, RN5, RN6, RN7, RN8, RegionNumber, 0x00, 0x00, 0x00, oxm1, oym1, "?", "?"
-                        , "?", "?", "?", "?", "?", "?", "?", "?", ox1, ox2, ox3, ox4, oy1, oy2, oy3, oy4
-                        , oz1, oz2, oz3, oz4, "?", heading12, heading13, heading14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, "?"
-                        , "?", heading22, heading23, heading24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-            Acceleration_address := mem.processPatternScan(,, aPattern*)
-            If (Acceleration_address>0){
-                Acceleration_AddressBase := Acceleration_address + 0x40
-                Progress, 55
-            }
-        }
+If (Address_WriteableCoords!>0){
+    Progress,,Coordinates`nDo not move Character or Camera.
+    aPattern := [ox1, ox2, ox3, ox4, oy1, oy2, oy3, oy4, oz1, oz2, oz3, oz4, "?", heading12, heading13, heading14
+    , "?", "?", "?", "?", "?", "?", "?", "?", "?", heading22, heading23, heading24, "?", "?", "?", "?"
+    , "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"
+    , "?", "?", "?", "?", "?", "?", "?", "?", ox1, ox2, ox3, ox4, oy1, oy2, oy3, oy4
+    , oz1, oz2, oz3, oz4, "?", heading12, heading13, heading14, "?", "?", "?", "?", "?", "?", "?", "?"
+    , "?", heading22, heading23, heading24, "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"
+    , "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"
+    , ox1, ox2, ox3, ox4, oy1, oy2, oy3, oy4, oz1, oz2, oz3, oz4, "?", heading12, heading13, heading14
+    , "?", "?", "?", "?", "?", "?", "?", "?", "?", heading22, heading23, heading24, "?", "?", "?", "?"]
+    Address_WriteableCoords := mem.processPatternScan(,, aPattern*)
+}
 
         If (CurrentServer_address!>0){
             Progress,,Server`nDo not move Character or Camera.
-            aPattern := mem.hexStringToPattern("04 00 00 80 00 00 00 00 00 00 00 00 00 00 00 00 ?? 00 00 00 ?? ?? ?? ?? ?? ?? 00 80 ?? 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
+            aPattern := mem.hexStringToPattern("20 48 ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 0B 00 00 00 04 00 00 00 02 00 00 00 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 04 00 00 80 00 00 00 00 00 00 00 00 00 00 00 00")
             CurrentServer_address := mem.processPatternScan(,, aPattern*)
             If (CurrentServer_address>0){
-                CurrentServer_AddressBase := CurrentServer_address + 0x10
+                CurrentServer_AddressBase := CurrentServer_address + 0x50
                 Progress, 70
             }
         }
         If (InstanceID_address!>0){
             Progress,,Instance`nDo not move Character or Camera.
-            aPattern := mem.hexStringToPattern(vx3 vx4 "??" "??" vy3 vy4 "??" "??" vz3 vz4 "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" vx3 vx4 "??" "??" vy3 vy4 "??" "??" vz3 vz4)         
+            aPattern := mem.hexStringToPattern(vx1 vx2 vx3 vx4 vy1 vy2 vy3 vy4 vz1 vz2 vz3 vz4 "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" "??" vx1 vx2 vx3 vx4 vy1 vy2 vy3 vy4 vz1 vz2 vz3 vz4)         
             InstanceID_address := mem.processPatternScan(,, aPattern*)
             If (InstanceID_address>0){
-                InstanceID_addressBase := InstanceID_address + 0xF7
+                InstanceID_addressBase := InstanceID_address + 0xF8
                 Progress, 85
             }
         }
 
-    }until ((InstanceID_address>0 && Acceleration_address>0 && CurrentServer_address>0) || A_Index>=3)
+    }until ((Address_WriteableCoords>0 && InstanceID_address>0 && CurrentServer_address>0) || A_Index>=3)
 
 Progress, 100
 Sleep 500
@@ -171,7 +165,6 @@ gosub, Initialize
 CreateGui()
 ScriptStatus:=1
 Return
-
 
 
 $Pause::
@@ -215,12 +208,18 @@ ButtonDelete:
     UpdatePresetList()
 Return
 
-ButtonReset:
+ButtonResetFoV:
     mem.write(FoV_AddressBase, 45, "UFloat")
     WinGetPos, OutX, OutY, OutWidth, OutHeight, ahk_pid %lotro_window%
     FoVRead := (OutWidth / OutHeight) * 45
     GuiControl,, VarFoVEdit, % Round(FoVRead)
     GuiControl,, VarFoVSlider, % Round(FoVRead)
+Return
+
+ButtonResetMaxZoom:
+    mem.write(FoV_AddressBase + 0x170, 20, "UFloat")
+    GuiControl,, VarMaxZoomEdit, 20
+    GuiControl,, VarMaxZoomSlider, 20
 Return
 
 OpenGitHub:
@@ -287,7 +286,7 @@ WriteValuesToMemory(){
     for index, item in AddressData {
         Key := item[1]
         IniRead, Value_INI, settings.ini, %MyDropdown%, %Key%
-        If (Value_INI!="Value not found" && Value_INI!="" && Value_INI!="ERROR")    ; if Value_INI not in ,Value not found,ERROR
+        If (Value_INI!="Value not found" && Value_INI!="" && Value_INI!="ERROR")
             mem.write(moduleBase + AddressBase + item[2], Value_INI, item[3])
     }
 }
@@ -567,14 +566,21 @@ CreateGui(){
     Gui, Add, Button, x98 yp+0 gButtonDelete w85, Delete
 
     Gui, Tab, 2
-    Gui, Add, Text, x7 y57 0x800000 vFoVText Center, `nChange your field of view.`nFirst Person not supported at the moment.`n
+    Gui, Add, GroupBox, x3 y55 w225 h50 Center, Field of view
     FoV_Factor_ValueInMem := mem.read(FoV_AddressBase, "UFloat")
     WinGetPos, OutX, OutY, OutWidth, OutHeight, ahk_pid %lotro_window%
     FoVRead := (OutWidth / OutHeight) * FoV_Factor_ValueInMem
-    Gui, Add, Slider, y+10 vVarFoVSlider gFoVSlider AltSubmit TickInterval10 Range40-200, % Round(FoVRead)
+    Gui, Add, Slider, x5 y70 vVarFoVSlider gFoVSlider AltSubmit TickInterval20 Range40-200, % Round(FoVRead)
     Gui, Add, Edit, vVarFoVEdit w50 x+5 Center ReadOnly, % Round(FoVRead)
     Gui, Add, UpDown, Range40-200 vVarFoVUpDown gFoVUpDown, % Round(FoVRead)
-    Gui, Add, Button, x+0 yp-1 w44 vVarButtonReset gButtonReset, Reset
+    Gui, Add, Button, x+0 yp-1 w44 vVarButtonResetFoV gButtonResetFoV, Reset
+
+    Gui, Add, GroupBox, x3 y110 w225 h50 Center, Maximum Zoom Level
+    MaximumZoomLevel_ValueInMem := mem.read(FoV_AddressBase + 0x170, "UFloat")
+    Gui, Add, Slider, x5 y125 vVarMaxZoomSlider gMaxZoomSlider AltSubmit TickInterval20 Range10-200, % Round(MaximumZoomLevel_ValueInMem)
+    Gui, Add, Edit, vVarMaxZoomEdit w50 x+5 Center ReadOnly, % Round(MaximumZoomLevel_ValueInMem)
+    Gui, Add, UpDown, Range5-200 vVarMaxZoomUpDown gMaxZoomUpDown, % Round(MaximumZoomLevel_ValueInMem)
+    Gui, Add, Button, x+0 yp-1 w44 vVarButtonResetMaxZoom gButtonResetMaxZoom, Reset
 
     Gui, Tab, 3
     Gui, Add, Text, x7 y57 w300 h80 vVarCouponText,
@@ -614,10 +620,10 @@ FishingOnOff(){
     Else {
         GuiControl,, VarFishingText, Status: Searching for memory address ...
         GuiControl,, VarProgressButton, 50
-        aPattern := mem.hexStringToPattern("00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 40 ED ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00 00")
+        aPattern := mem.hexStringToPattern("00 00 00 00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00")
         Fish_BaseAddress := mem.processPatternScan(,, aPattern*)
         If (Fish_BaseAddress>0){
-            Fish_BaseAddress += 0x1D
+            Fish_BaseAddress += 0x20
             GuiControl,, VarProgressButton, 100
             Gosub, LetMeFish
             SetTimer, LetMeFish, 1000
@@ -662,11 +668,21 @@ FoVSlider(){
 }
 FoVUpDown(){
     global
-    GuiControl, Disable, VarFoVEdit
     FoV_Write := (VarFoVUpDown * OutHeight) / OutWidth
     GuiControl,, VarFoVSlider, % Round(VarFoVUpDown)
     mem.write(FoV_AddressBase, FoV_Write, "UFloat")
-    GuiControl, Enable, VarFoVEdit
+}
+MaxZoomSlider(){
+    global
+    GuiControl,, VarMaxZoomEdit, % Round(VarMaxZoomSlider)
+    mem.write(FoV_AddressBase + 0x170, VarMaxZoomSlider, "UFloat")
+    mem.write(FoV_AddressBase + 0xA0, VarMaxZoomSlider, "UFloat")
+}
+MaxZoomUpDown(){
+    global
+    GuiControl,, VarMaxZoomSlider, % Round(VarMaxZoomUpDown)
+    mem.write(FoV_AddressBase + 0x170, VarMaxZoomUpDown, "UFloat")
+    mem.write(FoV_AddressBase + 0xA0, VarMaxZoomUpDown, "UFloat")
 }
 GetCode(){
     global
@@ -683,7 +699,14 @@ MyTabs(){
         FoVRead := (OutWidth / OutHeight) * FoV_Factor_ValueInMem
         GuiControl,, VarFoVEdit, % Round(FoVRead)
         GuiControl,, VarFoVSlider, % Round(FoVRead)
-        Sleep 5
+        GuiControl, Disable, VarFoVSlider
+        GuiControl, Enable, VarFoVSlider
+
+        MaximumZoomLevel_ValueInMem := mem.read(FoV_AddressBase + 0x170, "UFloat")
+        GuiControl,, VarMaxZoomEdit, % Round(MaximumZoomLevel_ValueInMem)
+        GuiControl,, VarMaxZoomSlider, % Round(MaximumZoomLevel_ValueInMem)
+        GuiControl, Disable, VarMaxZoomSlider
+        GuiControl, Enable, VarMaxZoomSlider
     }
     If (VarMyTabs!="Misc") {
         SetTimer, UpdateCoordinates, Off
@@ -704,25 +727,36 @@ Cleanup(){
 UpdateCoordinates:
     InstanceID := mem.read(InstanceID_addressBase, "UShort")
 
-    ox:=mem.read(Acceleration_AddressBase + 0x18, "UFloat")
-    oy:=mem.read(Acceleration_AddressBase + 0x1C, "UFloat")
-    oz:=mem.read(Acceleration_AddressBase + 0x20, "UFloat")
-    oxm:=mem.read(Acceleration_AddressBase + 0xC, "UChar")
-    oym:=mem.read(Acceleration_AddressBase + 0xD, "UChar")
-If (ox=0 && oy=0 && oz=0 && oxm=0 && oym=0){
-    Reload
-    ExitApp
-}
-
+    ox:=mem.read(Address_WriteableCoords, "UFloat")
+    oy:=mem.read(Address_WriteableCoords + 0x4, "UFloat")
+    oz:=mem.read(Address_WriteableCoords + 0x8, "UFloat")
+    oxm:=mem.read(Address_WriteableCoords - 0xC, "UChar")
+    oym:=mem.read(Address_WriteableCoords - 0xB, "UChar")
+    ClientRunTime1:=mem.read(FoV_AddressBase + 0x70, "Double")
+    ClientRunTime2:=mem.read(FoV_AddressBase + 0x140, "Double")
+    If (ox=0 && oy=0 && oz=0 && oxm=255 && oym=255 && ClientRunTime1!=ClientRunTime2) {
+        Sleep 1000
+        ox:=mem.read(Address_WriteableCoords, "UFloat")
+        oy:=mem.read(Address_WriteableCoords + 0x4, "UFloat")
+        oz:=mem.read(Address_WriteableCoords + 0x8, "UFloat")
+        oxm:=mem.read(Address_WriteableCoords - 0xC, "UChar")
+        oym:=mem.read(Address_WriteableCoords - 0xB, "UChar")
+        ClientRunTime1:=mem.read(FoV_AddressBase + 0x70, "Double")
+        ClientRunTime2:=mem.read(FoV_AddressBase + 0x140, "Double")
+        If (ox=0 && oy=0 && oz=0 && oxm=255 && oym=255 && ClientRunTime1!=ClientRunTime2) {
+            Reload
+            ExitApp
+        }
+    }
 
     DevX := oxm * 160 + ox
     DevY := oym * 160 + oy
 
-    directionFloat1:=mem.read(Acceleration_AddressBase + 0x24, "UFloat")
-    directionFloat2:=mem.read(Acceleration_AddressBase + 0x30, "UFloat")
-    VerticalSpeed:=mem.read(Acceleration_AddressBase - 0x68, "UFloat")
-    LateralSpeed:=mem.read(Acceleration_AddressBase - 0x6C, "UFloat")
-    LinearSpeed:=mem.read(Acceleration_AddressBase - 0x64, "UFloat")
+    directionFloat1:=mem.read(Address_WriteableCoords + 0xC, "UFloat")
+    directionFloat2:=mem.read(Address_WriteableCoords + 0x18, "UFloat")
+    VerticalSpeed:=mem.read(Address_WriteableCoords + 0x158, "UFloat")
+    LateralSpeed:=mem.read(Address_WriteableCoords + 0x160, "UFloat")
+    LinearSpeed:=mem.read(Address_WriteableCoords + 0x15C, "UFloat")
 
     directionDegree := Round(Abs(ATan2(directionFloat2, directionFloat1)) * 360 / 3.141592653589793, 2)
     compassDirections := ["N ", "NE", "E ", "SE", "S ", "SW", "W ", "NW"]
@@ -733,22 +767,17 @@ If (ox=0 && oy=0 && oz=0 && oxm=0 && oym=0){
     Py := Round((DevY - 24880) / 200,1)
     Py := (Py < 0) ? Round(Abs(Py), 1) "S" : Py .= "N"
 
-    sx:=mem.read(Acceleration_AddressBase + 0x38, "UFloat")
-    sy:=mem.read(Acceleration_AddressBase + 0x3C, "UFloat")
-    sz:=mem.read(Acceleration_AddressBase + 0x40, "UFloat")
-
-    RegionNumber := mem.read(AddressBase + moduleBase + 0x3FDC, "UChar")
-    RegionNames := ["Eriador","Rhovanion","Gondor","Mordor"]
-
     ServerNumber := mem.read(CurrentServer_AddressBase, "UShort")
-    InstanceNumber := mem.read(AddressBase + moduleBase + 0x3FE4, "UShort")
+    InstanceNumber := mem.read(AddressBase + moduleBase + 0x40F4, "UShort")
+    RegionNumber := mem.read(AddressBase + moduleBase + 0x40EC, "UChar")
+    RegionNames := ["Eriador","Rhovanion","Gondor","Mordor"]
 
     Gui, ListView, VarListViewTab4_1
     LV_modify(1, "Col2", RegionNumber > 0 ? RegionNames[RegionNumber] : "")
     LV_modify(2, "Col2", ServerNumber > 0 ? ServerNumber : ""),LV_modify(2, "Col3", InstanceNumber > 0 ? " i"InstanceNumber : "")
     LV_modify(3, "Col2", Round(DevX,2)),LV_modify(3, "Col3", Round(DevY,2)),LV_modify(3, "Col4", Round(oz,2))
     LV_modify(4, "Col2", directionDegree . "°"),LV_modify(4, "Col3", directionCompass)
-    LV_modify(5, "Col2", Round(Sqrt(sx**2 + sy**2 + sz**2),2) . " m/s")
+    LV_modify(5, "Col2", Round(Sqrt(VerticalSpeed**2 + LateralSpeed**2 + LinearSpeed**2),2) . " m/s")
     LV_modify(6, "Col2", Round(LinearSpeed,2) . " m/s"),LV_modify(6, "Col3", Round(Abs(VerticalSpeed),2) . " m/s"),LV_modify(6, "Col4", Round(LateralSpeed,2) . " m/s")
     Gui, ListView, VarListViewTab4_2
     LV_modify(1, "Col1", Py ", " Px)
@@ -759,6 +788,8 @@ Return
 atan2(y,x) {
     Return atan(y/x)+2*(1+(x<0))*atan((x<=0)*((y>=0)-(y<0)))
 }
+
+
 
 Initialize:
 
@@ -815,10 +846,10 @@ AddressData.Push(["Volumetric_Sun_Lightning", 2458, "UChar", "IN", "0,1"]
                 ,["3D_Object_Portraits", 2554, "UChar", "IN", "0,1"]
                 ,["Texture_Cache_Size", 2556, "UFloat", "BETWEEN", , "0.0", "1.0"]
                 ,["Per_Pixel_Lightning_Attenuation", 2561, "UChar", "IN", "0,1"]
-                ,["Maximum_Frame_Rate", 4402800, "UShort", "BETWEEN", , "0", "1000"]
-                ,["Avatar_Texture_Compositing", 4468360, "UChar", "IN", "0,1"]
-                ,["Avatar_Update_Visible", 4468361, "UChar", "IN", "0,1"]
-                ,["PvMP_Performance_Override", 4468363, "UChar", "IN", "0,1"])
+                ,["Maximum_Frame_Rate", 4403840, "UShort", "BETWEEN", , "0", "1000"]
+                ,["Avatar_Texture_Compositing", 4469464, "UChar", "IN", "0,1"]
+                ,["Avatar_Update_Visible", 4469465, "UChar", "IN", "0,1"]
+                ,["PvMP_Performance_Override", 4469467, "UChar", "IN", "0,1"])
 
 InstanceNames := {}
 InstanceNames[0] := ["","",""]
