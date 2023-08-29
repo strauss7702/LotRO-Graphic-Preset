@@ -1,6 +1,6 @@
 ## Features
 ![LB_1](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/8fc147bb-5904-46b0-98d7-c1655b2cf435)
-![LB_2](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/78595c8b-0e63-4524-96da-92224649966b)
+![LB_2](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/9200924a-1ca6-444e-ae56-20038660faf0)
 ![LB_3](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/1a136bb0-d057-40ed-8ae4-01ced81a3553)
 ![LB_4](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/7e26939e-fab2-4846-8190-e2f7dd7e73ac)
 ![LB_5](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/5aea7e50-0d96-4ed1-8ecc-a68369163447)
@@ -32,11 +32,11 @@ Everything in **Graphics**, **Adv Graphics** and **Troubleshoot**.
 <br/><br/>
 
 #### Tested
-- LotRO Update 36.2 - Wednesday August 2, 2023
+- LotRO Update 37 - Tuesday August 29, 2023
 - Windows 10 22H2
 - 64-bit Client
 
 #### Todo
 - beautify Gui
 - clean (redundant) code
-- Add more things that can be saved in the presets
+- Add more stuff
