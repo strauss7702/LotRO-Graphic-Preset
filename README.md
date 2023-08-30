@@ -11,7 +11,7 @@ While the actual settings will change when you load a **graphic** preset, the in
 
 ## Requirements
 Either just use the [LotRO_Buddy.exe](https://github.com/strauss7702/LotRO_Buddy/releases)  
-_In case you do not trust exe files you can check the file on [Virustotal](https://www.virustotal.com/gui/home/url)_
+_In case you do not trust exe files you can check [the file](https://www.virustotal.com/gui/url/1612047ed1d9c3d55a46ecf58e92e476862c62ed937f12407e9e8fd1057de3f2) on [Virustotal](https://www.virustotal.com/gui/home/url)_
 
 **or**
 
