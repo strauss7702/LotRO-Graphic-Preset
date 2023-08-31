@@ -1,9 +1,9 @@
 ## Features
-![LB_1](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/8fc147bb-5904-46b0-98d7-c1655b2cf435)
-![LB_2](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/9200924a-1ca6-444e-ae56-20038660faf0)
-![LB_3](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/1a136bb0-d057-40ed-8ae4-01ced81a3553)
-![LB_4](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/7e26939e-fab2-4846-8190-e2f7dd7e73ac)
-![LB_5](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/5aea7e50-0d96-4ed1-8ecc-a68369163447)
+![LB_1](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/626bc143-105b-4510-81ef-fbf9d1a8f8f3)
+![LB_2](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/ee7b291f-0fe5-4f75-85ce-df84b00a18a4)
+![LB_3](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/bd2d030f-80f4-4ab2-88ff-57a5f58e1186)
+![LB_4](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/03020083-b540-48d7-bfb1-d3a82773a15f)
+![LB_5](https://github.com/strauss7702/LotRO_Buddy/assets/138319390/bb267634-b7d2-4243-a09e-91bbf352dfd9)
 
 While the actual settings will change when you load a **graphic** preset, the in game menu [options->graphics/adv graphics/troubleshoot] will not reflect that. If you want to save a preset after you have used the load function, go to [options->graphics->overall graphics quality] and click on any option (or restart LotRO) to refresh the in game options menu.
 
