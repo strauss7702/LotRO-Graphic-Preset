@@ -499,7 +499,7 @@ CreateGui(){
     Gui, Font, s14 cF5DF92
     Gui, Add, Text, x0 y0 w300 h24 Center BackgroundTrans, LotRO Buddy
     Gui, Font
-    Gui, Add, Tab3, x0 y25 w300 h200 Buttons Border vVarMyTabs gMyTabs,Graphic|FoV|Coupon|Misc|Fishing
+    Gui, Add, Tab3, x0 y24 w300 h176 Buttons Border vVarMyTabs gMyTabs,Graphic|FoV|Coupon|Misc|Fishing
 
     Gui, Tab, 1
     Gui, Add, GroupBox, x3 y55 w183 h70 Center, Save Preset
@@ -551,7 +551,6 @@ CreateGui(){
     Gui, Add, Progress,  x7 y+20 w85 h25 Disabled BackgroundGray cGreen vVarProgressButton
     Gui, Add, Text, xp yp wp hp BackgroundTrans 0x201 gFishingOnOff
 
-    WinGet, lotro_window_Hwnd , ID, ahk_pid %lotro_window%
     Gui, +AlwaysOnTop
     Gui, Show, w300 h200
     WinActivate, ahk_exe lotroclient64.exe
