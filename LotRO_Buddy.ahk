@@ -567,10 +567,10 @@ FishingOnOff(){
     Else {
         GuiControl,, VarFishingText, Status: Searching for memory address ...
         GuiControl,, VarProgressButton, 50
-        aPattern := mem.hexStringToPattern("00 00 00 00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00")
+        aPattern := mem.hexStringToPattern("00 00 00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00")
         Fish_BaseAddress := mem.processPatternScan(,, aPattern*)
         If (Fish_BaseAddress>0){
-            Fish_BaseAddress += 0x20
+            Fish_BaseAddress += 0x1F
             GuiControl,, VarProgressButton, 100
             Gosub, LetMeFish
             SetTimer, LetMeFish, 1000
