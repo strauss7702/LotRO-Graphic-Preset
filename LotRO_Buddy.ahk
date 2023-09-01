@@ -8,6 +8,7 @@ Coordmode, Mouse, Client
 OnExit("Cleanup")
 OnMessage(0x201, "WM_LBUTTONDOWN")
 OnMessage(0x202, "WM_LBUTTONUP")
+currentVersion := "0.4.3"
 
 if !A_IsAdmin {
     Run *RunAs "%A_ScriptFullPath%"
