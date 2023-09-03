@@ -8,7 +8,7 @@ Coordmode, Mouse, Client
 OnExit("Cleanup")
 OnMessage(0x201, "WM_LBUTTONDOWN")
 OnMessage(0x202, "WM_LBUTTONUP")
-currentVersion := "0.4.3"
+currentRelease := "0.4.4"
 
 if !A_IsAdmin {
     Run *RunAs "%A_ScriptFullPath%"
@@ -19,8 +19,15 @@ if (_ClassMemory.__Class != "_ClassMemory") {
     ExitApp
 }
 
-if !(FileExist("settings.ini"))
-    FileAppend,, settings.ini
+If (latestRelease := CheckForUpdates(currentRelease))
+    If (currentRelease!=latestRelease)
+        MsgBox,4100 ,Update available, % "Current Release: " currentRelease "`nLatest Release: " latestRelease "`nWould you like to visit the download page?"
+IfMsgBox Yes
+    {
+    Run, https://github.com/strauss7702/LotRO_Buddy/releases
+    ExitApp
+}
+
 if !(FileExist("settings.ini"))
     FileAppend,, settings.ini
 
@@ -82,6 +89,12 @@ Loop {
 Loop{
     Progress,,Coordinates %A_Index%/10`nDo not move Character or Camera.
     Progress, % 40 + A_Index
+    If (A_Index=5){
+        SetKeyDelay, 200, 200
+        ControlFocus,,ahk_pid %lotro_window%
+        ControlSend,,{Left},ahk_pid %lotro_window%
+        SetKeyDelay, 10, -1
+    }
     Address_WriteableCoords:=Get_Address_WriteableCoords(mem,FoV_AddressBase)
 }until (Address_WriteableCoords>0 || A_Index>=10)
 
@@ -515,19 +528,15 @@ CreateGui(){
 
     Gui, Tab, 2
     Gui, Add, GroupBox, x3 y55 w225 h50 Center, Field of view
-    FoV_Factor_ValueInMem := mem.read(FoV_AddressBase, "UFloat")
-    WinGetPos, OutX, OutY, OutWidth, OutHeight, ahk_pid %lotro_window%
-    FoVRead := (OutWidth / OutHeight) * FoV_Factor_ValueInMem
-    Gui, Add, Slider, x5 y70 vVarFoVSlider gFoVSlider AltSubmit TickInterval20 Range40-200, % Round(FoVRead)
-    Gui, Add, Edit, vVarFoVEdit w50 x+5 Center ReadOnly, % Round(FoVRead)
-    Gui, Add, UpDown, Range40-200 vVarFoVUpDown gFoVUpDown, % Round(FoVRead)
+    Gui, Add, Slider, x5 y70 vVarFoVSlider gFoVSlider AltSubmit TickInterval20 Range40-200, 80
+    Gui, Add, Edit, vVarFoVEdit w50 x+5 Center ReadOnly, 80
+    Gui, Add, UpDown, Range40-200 vVarFoVUpDown gFoVUpDown, 80
     Gui, Add, Button, x+0 yp-1 w44 vVarButtonResetFoV gButtonResetFoV, Reset
 
     Gui, Add, GroupBox, x3 y110 w225 h50 Center, Maximum Zoom Level
-    MaximumZoomLevel_ValueInMem := mem.read(FoV_AddressBase + 0x170, "UFloat")
-    Gui, Add, Slider, x5 y125 vVarMaxZoomSlider gMaxZoomSlider AltSubmit TickInterval20 Range10-200, % Round(MaximumZoomLevel_ValueInMem)
-    Gui, Add, Edit, vVarMaxZoomEdit w50 x+5 Center ReadOnly, % Round(MaximumZoomLevel_ValueInMem)
-    Gui, Add, UpDown, Range5-200 vVarMaxZoomUpDown gMaxZoomUpDown, % Round(MaximumZoomLevel_ValueInMem)
+    Gui, Add, Slider, x5 y125 vVarMaxZoomSlider gMaxZoomSlider AltSubmit TickInterval20 Range10-200, 20
+    Gui, Add, Edit, vVarMaxZoomEdit w50 x+5 Center ReadOnly, 20
+    Gui, Add, UpDown, Range5-200 vVarMaxZoomUpDown gMaxZoomUpDown, 20
     Gui, Add, Button, x+0 yp-1 w44 vVarButtonResetMaxZoom gButtonResetMaxZoom, Reset
 
     Gui, Tab, 3
@@ -546,38 +555,60 @@ CreateGui(){
     LV_Add(, "Region:",""),LV_Add(, "Server:",""),LV_Add(, "XYZ:",""),LV_Add(, "Heading:",""),LV_Add(, "Velocity:",""),LV_Add(, "Acc.:","")
 
     Gui, Tab, 5
-    Gui, Add, Text, x7 y57 0x800000 Center, Equip your fishing rod.`nFishing Skill on 1 is required.`nCast Your Rod atleast once before activating!
+    Gui, Add, Text, x7 y57 0x800000 Center, Equip your fishing rod.`nFishing Skill on 1 is required.`nCast your rod atleast once before activating!
     Gui, Add, Text, x7 y+10 w200  vVarFishingText, Status: Off
-    Gui, Add, Text, x7 y+5 w200  vVarBaitText, Bait:
-    Gui, Add, Progress,  x7 y+20 w85 h25 Disabled BackgroundGray cGreen vVarProgressButton
-    Gui, Add, Text, xp yp wp hp BackgroundTrans 0x201 gFishingOnOff
+    Gui, Add, Text, x7 y+0 w200  vVarBaitText, Bait:
+    Gui, Add, Progress, x7 y+20 w85 h25 Disabled Background808080 cGreen vProgressFishing
+    Gui, Add, Text, xp yp wp hp Center BackgroundTrans 0x201 gToggleFishing vVarToggleFishing, Start
 
     Gui, +AlwaysOnTop
     Gui, Show, w300 h200
     WinActivate, ahk_exe lotroclient64.exe
 }
-FishingOnOff(){
+ToggleFishing(){
     global
+    Gui, Submit, NoHide
     FishingFlag := !FishingFlag
 	If (!FishingFlag) {
-        GuiControl,, VarProgressButton, 0
-        SetTimer, LetMeFish, Off
+        GuiControl, +Background808080, ProgressFishing
+        GuiControl,, VarToggleFishing, Start
         GuiControl,, VarFishingText, Status: Off
+        SetTimer, LetMeFish, Off
     }
     Else {
         GuiControl,, VarFishingText, Status: Searching for memory address ...
-        GuiControl,, VarProgressButton, 50
-        aPattern := mem.hexStringToPattern("00 00 00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00")
-        Fish_BaseAddress := mem.processPatternScan(,, aPattern*)
+        GuiControl, +Backgroundffa500, ProgressFishing
+        GuiControl,, VarToggleFishing,
         If (Fish_BaseAddress>0){
-            Fish_BaseAddress += 0x1F
-            GuiControl,, VarProgressButton, 100
-            Gosub, LetMeFish
-            SetTimer, LetMeFish, 1000
-            Return
+            aPattern := mem.hexStringToPattern("00 00 00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00")
+            Fish_BaseAddress := mem.processPatternScan(Fish_BaseAddress - 0x1F,Fish_BaseAddress + 0x2A, aPattern*)
+            If (Fish_BaseAddress>0){
+                Fish_BaseAddress += 0x1F
+                GuiControl, +BackgroundGreen, ProgressFishing
+                Sleep 5
+                GuiControl,, VarToggleFishing, Stop
+                Gosub, LetMeFish
+                SetTimer, LetMeFish, 1000
+                Return
+            }
         }
+        If (Fish_BaseAddress<=0 || Fish_BaseAddress=""){
+            aPattern := mem.hexStringToPattern("00 00 00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00")
+            Fish_BaseAddress := mem.processPatternScan(,, aPattern*)
+            If (Fish_BaseAddress>0){
+                Fish_BaseAddress += 0x1F
+                GuiControl, +BackgroundGreen, ProgressFishing
+                Sleep 5
+                GuiControl,, VarToggleFishing, Stop
+                Gosub, LetMeFish
+                SetTimer, LetMeFish, 1000
+                Return
+            }
+        }
+        
+        GuiControl, +BackgroundRed, ProgressFishing
         GuiControl,, VarFishingText, Status: Memory address not found!
-        GuiControl,, VarProgressButton, 0
+        GuiControl,, VarToggleFishing, Start
         FishingFlag := !FishingFlag
         Return
     }
@@ -824,6 +855,18 @@ Get_InstanceID_address(mem,AddressBase,moduleBase){
         InstanceID_addressBase := InstanceID_address + 0xF8
 
     Return InstanceID_addressBase
+}
+
+CheckForUpdates(currentRelease) {
+    WebObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    WebObj.Open("GET", "https://raw.githubusercontent.com/strauss7702/LotRO_Buddy/main/LotRO_Buddy.ahk")
+    WebObj.Send()
+
+    If (WebObj.Status = 200)
+        if (RegExMatch(WebObj.ResponseText, "currentRelease\s*:=\s*""(\d+\.\d+\.\d+)""", match)) {
+            RegExMatch(match, "(\d+\.\d+\.\d+)", latestRelease)
+            Return latestRelease
+        }
 }
 
 
