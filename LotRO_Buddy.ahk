@@ -432,7 +432,7 @@ global lotro_window:=""
             WebObj.Open("GET", "https://www.lotro.com/home/update-notes")
             WebObj.Send()
             HtmlText := WebObj.ResponseText
-            if (RegExMatch(HtmlText, "Update (\d+(?:\.\d+)*), released on (.*?),[^.</p>]*", LatestUpdate)){
+            if (RegExMatch(HtmlText, "Update (\d+(?:\.\d+)*), released on (.*?),[^.]*", LatestUpdate)){
                 LatestUpdateNumber := ""
                 LatestUpdateReleaseDate := ""
                 if (RegExMatch(LatestUpdate, "Update (\d+(?:\.\d+)*)", versionMatch))
