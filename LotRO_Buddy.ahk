@@ -8,7 +8,7 @@ Coordmode, Mouse, Client
 OnExit("Cleanup")
 OnMessage(0x201, "WM_LBUTTONDOWN")
 OnMessage(0x202, "WM_LBUTTONUP")
-currentRelease := "0.4.4"
+currentRelease := "0.4.5"
 
 if !A_IsAdmin {
     Run *RunAs "%A_ScriptFullPath%"
@@ -580,7 +580,7 @@ ToggleFishing(){
         GuiControl, +Backgroundffa500, ProgressFishing
         GuiControl,, VarToggleFishing,
         If (Fish_BaseAddress>0){
-            aPattern := mem.hexStringToPattern("00 00 00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00")
+            aPattern := mem.hexStringToPattern("01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00")
             Fish_BaseAddress := mem.processPatternScan(Fish_BaseAddress - 0x1F,Fish_BaseAddress + 0x2A, aPattern*)
             If (Fish_BaseAddress>0){
                 Fish_BaseAddress += 0x1F
@@ -593,7 +593,7 @@ ToggleFishing(){
             }
         }
         If (Fish_BaseAddress<=0 || Fish_BaseAddress=""){
-            aPattern := mem.hexStringToPattern("00 00 00 01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00 ?? ?? 00")
+            aPattern := mem.hexStringToPattern("01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00")
             Fish_BaseAddress := mem.processPatternScan(,, aPattern*)
             If (Fish_BaseAddress>0){
                 Fish_BaseAddress += 0x1F
