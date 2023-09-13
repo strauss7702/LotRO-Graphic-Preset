@@ -583,7 +583,7 @@ ToggleFishing(){
             aPattern := mem.hexStringToPattern("01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00")
             Fish_BaseAddress := mem.processPatternScan(Fish_BaseAddress - 0x1F,Fish_BaseAddress + 0x2A, aPattern*)
             If (Fish_BaseAddress>0){
-                Fish_BaseAddress += 0x1F
+                Fish_BaseAddress += 0x1C
                 GuiControl, +BackgroundGreen, ProgressFishing
                 Sleep 5
                 GuiControl,, VarToggleFishing, Stop
@@ -596,7 +596,7 @@ ToggleFishing(){
             aPattern := mem.hexStringToPattern("01 03 ?? BB F6 1E 00 10 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00 ?? ?? ?? ?? ?? ?? 00 00 ?? 00 00 00 00 00 00 00")
             Fish_BaseAddress := mem.processPatternScan(,, aPattern*)
             If (Fish_BaseAddress>0){
-                Fish_BaseAddress += 0x1F
+                Fish_BaseAddress += 0x1C
                 GuiControl, +BackgroundGreen, ProgressFishing
                 Sleep 5
                 GuiControl,, VarToggleFishing, Stop
