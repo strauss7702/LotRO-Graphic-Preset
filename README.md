@@ -18,7 +18,7 @@ While the actual settings will change when you load a **graphic** preset, the in
 Screen Mode: Full Screen (Windowed) or Windowed  
 
 Either just use the [LotRO_Buddy.exe](https://github.com/strauss7702/LotRO_Buddy/releases)  
-_In case you do not trust exe files you can check the file on [Virustotal](https://www.virustotal.com/gui/search/https%253A%252F%252Fgithub.com%252Fstrauss7702%252FLotRO_Buddy%252Freleases%252Fdownload%252F0.4.5%252FLotRO_Buddy.exe)_
+_In case you do not trust exe files you can check the file on [Virustotal](https://www.virustotal.com/gui/search/https%253A%252F%252Fgithub.com%252Fstrauss7702%252FLotRO_Buddy%252Freleases%252Fdownload%252F0.4.6%252FLotRO_Buddy.exe)_
 
 **or**
 
@@ -34,7 +34,7 @@ Everything in **Graphics**, **Adv Graphics** and **Troubleshoot**.
 <br/><br/>
 
 #### Tested
-- LotRO Update 37.1 - Wednesday September 13, 2023
+- LotRO Update 37.2.1 - Wednesday October 11, 2023
 - Windows 10 22H2
 - 64-bit Client
 
