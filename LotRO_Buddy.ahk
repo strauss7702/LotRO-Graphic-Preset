@@ -8,7 +8,7 @@ Coordmode, Mouse, Client
 OnExit("Cleanup")
 OnMessage(0x201, "WM_LBUTTONDOWN")
 OnMessage(0x202, "WM_LBUTTONUP")
-currentRelease := "0.4.5"
+currentRelease := "0.4.6"
 
 if !A_IsAdmin {
     Run *RunAs "%A_ScriptFullPath%"
@@ -110,6 +110,12 @@ Loop{
     InstanceID_addressBase:=Get_InstanceID_address(mem,AddressBase,moduleBase)
 }until (InstanceID_addressBase>0 || A_Index>=10)
 
+Loop{
+    Progress,,ToolTip %A_Index%/10`nDo not move Character or Camera.
+    Progress, % 80 + A_Index
+    StaticTooltip_addressBase:=Get_StaticTooltip_address(mem)
+}until (StaticTooltip_addressBase>0 || A_Index>=10)
+ClipBoard:=StaticTooltip_addressBase
 
 
 Progress, 100
@@ -233,6 +239,11 @@ CheckValuesInMemory(writetoINI) {
                 }
         }
     }
+
+    If (writetoINI=1) {
+        StaticToolTip_Read := mem.read(StaticTooltip_addressBase, "UChar")
+        IniWrite, % (StaticToolTip_Read=0 || StaticToolTip_Read=1) ? StaticToolTip_Read : "Value not found", settings.ini, %SettingsName%, StaticToolTip
+    }
 }
 
 WriteValuesToMemory(){
@@ -240,9 +251,12 @@ WriteValuesToMemory(){
     for index, item in AddressData {
         Key := item[1]
         IniRead, Value_INI, settings.ini, %MyDropdown%, %Key%
-        If (Value_INI!="Value not found" && Value_INI!="" && Value_INI!="ERROR")
+        If (Value_INI!="Value not found" && Value_INI!="" && Value_INI!="ERROR" && Key!=StaticToolTip)
             mem.write(moduleBase + AddressBase + item[2], Value_INI, item[3])
     }
+    IniRead, Value_INI, settings.ini, %MyDropdown%, StaticToolTip
+    If (Value_INI!="Value not found" && Value_INI!="" && Value_INI!="ERROR")
+        mem.write(StaticTooltip_addressBase, Value_INI, "UChar")
 }
 
 ReformatINI(filename){
@@ -857,6 +871,15 @@ Get_InstanceID_address(mem,AddressBase,moduleBase){
     Return InstanceID_addressBase
 }
 
+Get_StaticTooltip_address(mem){
+    aPattern := mem.hexStringToPattern("F0 F6 35 E1 F7 7F 00 00 A8 F9 35 E1 F7 7F 00 00 70 F7 35 E1 F7 7F 00 00 B0 F9 35 E1 F7 7F 00 00 80 F7 35 E1 F7 7F 00 00 B8 F9 35 E1 F7 7F 00 00 08 F9 35 E1 F7 7F 00 00 C0 F9 35 E1 F7 7F 00 00 68 F9 35 E1 F7 7F 00 00 C8 F9 35 E1 F7 7F 00 00")         
+    StaticTooltip_address := mem.processPatternScan(,, aPattern*)
+    If (StaticTooltip_address>0)
+        StaticTooltip_addressBase := StaticTooltip_address + 0x74
+
+    Return StaticTooltip_addressBase
+}
+
 CheckForUpdates(currentRelease) {
     WebObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     WebObj.Open("GET", "https://raw.githubusercontent.com/strauss7702/LotRO_Buddy/main/LotRO_Buddy.ahk")
@@ -940,6 +963,7 @@ InstanceNames[10] := ["Instance", "Annuminas", "Haudh Valandil"]
 InstanceNames[15] := ["Non-Scaling Instance", "Angmar", "The Rift of Nurz Ghashu"]
 InstanceNames[17] := ["Classic Homestead", "Bree-land", "Bree-Land Homesteads"]
 InstanceNames[18] := ["Non-Scaling Instance", "Other", "Goblin-Town Throne Room"]
+InstanceNames[23] := ["Skirmish", "Defensive", "Doom of Caras Gelebren"]                ;???
 InstanceNames[35] := ["Non-Scaling Instance", "Garth Agarwen", "Fortress"]
 InstanceNames[44] := ["", "", "Intro"]  ;Intro (Man), Instance: Jail Break
 InstanceNames[61] := ["Non-Scaling Instance", "Angmar", "Urugarth"]
@@ -1068,31 +1092,45 @@ InstanceNames[1173] := ["Instance", "Gundabad", "Assault on Dhúrstrok"]
 InstanceNames[1184] := ["Instance", "Gundabad", "Adkhât-zahhar, the Houses of Rest"]
 InstanceNames[1190] := ["Non-Scaling Instance", "Gundabad", "The Hiddenhoard of Abnankara"]
 InstanceNames[1207] := ["Instance", "Before the Shadow", "Sarch Vorn, the Black Grave"]
-InstanceNames[1208] := ["Skirmish", "Defensive", "Doom of Caras Gelebren"]
+InstanceNames[1208] := ["Skirmish", "Defensive", "Doom of Caras Gelebren"]      ;Size:1 Tier:1 Level:140
+InstanceNames[1217] := ["Mission", "Before the Shadow Mission", "Stirring of Spirits"]
 InstanceNames[1218] := ["Mission", "Before the Shadow Mission", "The Ruins of Gaervarad"]
+InstanceNames[1219] := ["Mission", "Before the Shadow Mission", "Tharbad Tower Courtyard"]
 InstanceNames[1220] := ["Mission", "Before the Shadow Mission", "Caranost Courtyard"]
 InstanceNames[1221] := ["Mission", "Before the Shadow Mission", "The Bridge to Caranost"]
 InstanceNames[1222] := ["Mission", "Before the Shadow Mission", "Crown of Caranost"]
 InstanceNames[1223] := ["Mission", "Before the Shadow Mission", "The Nettinglade"]
 InstanceNames[1224] := ["Mission", "Before the Shadow Mission", "Jorthkyn and Hounds"]
 InstanceNames[1225] := ["Mission", "Before the Shadow Mission", "Haunting at Dol Ernil"]
+InstanceNames[1226] := ["Mission", "Before the Shadow Mission", "Caranost Command Post"]
 InstanceNames[1227] := ["Mission", "Before the Shadow Mission", "Steps of Caranost"]
+InstanceNames[1228] := ["Mission", "Before the Shadow Mission", "A Plague of Men"]
+InstanceNames[1229] := ["Mission", "Before the Shadow Mission", "Siege of Sirlond"]
+InstanceNames[1230] := ["Mission", "Before the Shadow Mission", "Brigands of Nimbarth"]
+InstanceNames[1235] := ["Mission", "Before the Shadow Mission", "Tharbad Tower Ascent"]
 InstanceNames[1236] := ["Mission", "Before the Shadow Mission", "Down on the Farm"]
 InstanceNames[1237] := ["Mission", "Before the Shadow Mission", "Shadows in the Greyflood"]
 InstanceNames[1238] := ["Mission", "Before the Shadow Mission", "Troubled Waters"]
 InstanceNames[1239] := ["Mission", "Before the Shadow Mission", "The Accursed Flame"]
 InstanceNames[1240] := ["Mission", "Before the Shadow Mission", "The Ruins of Amon Firn"]
+InstanceNames[1241] := ["Mission", "Before the Shadow Mission", "The Tombs of Gond Orchal"]
+InstanceNames[1242] := ["Mission", "Before the Shadow Mission", "The Tearful Tomb"]
+InstanceNames[1244] := ["Mission", "Before the Shadow Mission", "Sifting through Time"]
 InstanceNames[1245] := ["Mission", "Before the Shadow Mission", "Secrets and Plans"]
 InstanceNames[1246] := ["Mission", "Before the Shadow Mission", "Signs and Sigils"]
 InstanceNames[1247] := ["Mission", "Before the Shadow Mission", "The Hand, Out!"]
 InstanceNames[1248] := ["Mission", "Before the Shadow Mission", "Not as many Heads"]
+InstanceNames[1249] := ["Mission", "Before the Shadow Mission", "Among the Watch-Towers"]
 InstanceNames[1250] := ["Mission", "Before the Shadow Mission", "Siege-Breaking"]
 InstanceNames[1252] := ["Mission", "Before the Shadow Mission", "Before they Bond"]
 InstanceNames[1253] := ["Mission", "Before the Shadow Mission", "Into the Pits"]
 InstanceNames[1254] := ["Mission", "Before the Shadow Mission", "Terrible Tourtle Trouble"]
+InstanceNames[1255] := ["Mission", "Before the Shadow Mission", "Mother of Wolves"]
 InstanceNames[1256] := ["Mission", "Before the Shadow Mission", "The Jaws of Death"]
 InstanceNames[1257] := ["Mission", "Before the Shadow Mission", "Patrol the Township"]
 InstanceNames[1259] := ["Mission", "Before the Shadow Mission", "Leadership Direction"]
+InstanceNames[1260] := ["Mission", "Before the Shadow Mission", "Dangerous Deliveries"]
+InstanceNames[1262] := ["Mission", "Before the Shadow Mission", "Aberrations of Nature"]
 InstanceNames[1264] := ["Instance", "Ephel Angren", "Gwathrenost, The Witch-King's Citadel"]
 InstanceNames[1265] := ["Instance", "Ephel Angren", "Sant Lhoer, The Poison Gardens"]
 InstanceNames[1266] := ["Instance", "Ephel Angren", "Sagroth, Lair of Vermin"]
