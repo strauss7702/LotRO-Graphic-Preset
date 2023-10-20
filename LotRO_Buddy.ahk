@@ -872,7 +872,7 @@ Get_InstanceID_address(mem,AddressBase,moduleBase){
 }
 
 Get_StaticTooltip_address(mem){
-    aPattern := mem.hexStringToPattern("F0 F6 35 E1 F7 7F 00 00 A8 F9 35 E1 F7 7F 00 00 70 F7 35 E1 F7 7F 00 00 B0 F9 35 E1 F7 7F 00 00 80 F7 35 E1 F7 7F 00 00 B8 F9 35 E1 F7 7F 00 00 08 F9 35 E1 F7 7F 00 00 C0 F9 35 E1 F7 7F 00 00 68 F9 35 E1 F7 7F 00 00 C8 F9 35 E1 F7 7F 00 00")         
+        aPattern := mem.hexStringToPattern("F0 F6 ?? ?? F7 7F 00 00 A8 F9 ?? ?? F7 7F 00 00 70 F7 ?? ?? F7 7F 00 00 B0 F9 ?? ?? F7 7F 00 00 80 F7 ?? ?? F7 7F 00 00 B8 F9 ?? ?? F7 7F 00 00 08 F9 ?? ?? F7 7F 00 00 C0 F9 ?? ?? F7 7F 00 00 68 F9 ?? ?? F7 7F 00 00 C8 F9 ?? ?? F7 7F 00 00")
     StaticTooltip_address := mem.processPatternScan(,, aPattern*)
     If (StaticTooltip_address>0)
         StaticTooltip_addressBase := StaticTooltip_address + 0x74
