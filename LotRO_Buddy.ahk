@@ -8,7 +8,7 @@ Coordmode, Mouse, Client
 OnExit("Cleanup")
 OnMessage(0x201, "WM_LBUTTONDOWN")
 OnMessage(0x202, "WM_LBUTTONUP")
-currentRelease := "0.4.7"
+currentRelease := "0.4.8"
 
 if !A_IsAdmin {
     Run *RunAs "%A_ScriptFullPath%"
@@ -183,7 +183,7 @@ ButtonResetMaxZoom:
 Return
 
 OpenGitHub:
-    Run, https://github.com/strauss7702/LotRO-Graphic-Preset/issues/new
+    Run, https://github.com/strauss7702/LotRO_Buddy/issues/new
     Gui, Destroy
     ExitApp
 return
@@ -278,34 +278,44 @@ ReformatINI(filename){
 
 GetCouponCode(lotro_window){
     global VarCouponText
-    WebObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    WebObj.Open("GET", "https://forums.lotro.com/index.php?forums/sales-and-promotions.8/&order=post_date&direction=desc")
-    WebObj.Send()
-    HtmlText := WebObj.ResponseText
+    DateUTCTarget:=A_NowUTC
+    FormatTime, OutputVarDay, %A_NowUTC%, WDay
+        
+    While (OutputVarDay!=5) {
+        DateUTCTarget += -1, Days
+        FormatTime, OutputVarDay, %DateUTCTarget%, WDay
+        }
 
-    regex := "data-preview-url=""([^""]+)"".*>(Store Sales|LOTRO Sales|LOTRO Store Sales)"
-    if (RegExMatch(HtmlText, regex, match)){
-        newUrl := "https://forums.lotro.com" . match1
-        WebObj.Open("GET", newUrl)
+    FormatTime, DateUTCTargetS, %DateUTCTarget%, MMddyy
+
+    Loop {
+        newLink := "https://www.lotro.com/news/lotro-sales-" . DateUTCTargetS . "-en"
+        WebObj := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        WebObj.Open("GET", newLink)
         WebObj.Send()
         HtmlText := WebObj.ResponseText
-        couponCodeRegex := "Coupon Code:\s*(\w+)"
-        descriptionRegex := "<b>Weekly Coupon<\/b><br \/>[\r\n]*([\w\s()+%]+)"
-        couponCode := ""
-        description := ""
 
-        if (RegExMatch(HtmlText, couponCodeRegex, couponCodeMatch)){
-            couponCode := couponCodeMatch1
+        CheckSiteRegex := "lotro-sales-" . DateUTCTargetS . "-en"
+        If !(RegExMatch(HtmlText, CheckSiteRegex, CheckSiteMatch)) {
+            DateUTCTarget += -7, Days
+            FormatTime, DateUTCTargetS, %DateUTCTarget%, MMddyy
         }
-        if (RegExMatch(HtmlText, descriptionRegex, descriptionMatch)){
-            description := descriptionMatch1
+        Else If (A_Index>5) {
+            GuiControl,, VarCouponText, Newest Coupon Code could not be found.
+            Break
         }
+        Else {
+            ThisRegex := "<strong>Weekly Coupon<\/strong><br \/>\s*(.+?)\s*<br \/>Coupon Code:\s*(.+?)\s*<br \/>\s*(.+?)\s*<\/p>"
+            If (RegExMatch(HtmlText, ThisRegex, couponCodeMatch)) {
+                description := couponCodeMatch1
+                couponCode := couponCodeMatch2
+                UntilDate := couponCodeMatch3
+            }
         GetTimeLeftAndDate(EndingTime, DateUTCTargetLocal)
         Clipboard:=couponCode
-        GuiControl,, VarCouponText, Coupon Code: %couponCode%`n%description%`n`nExpires in about %EndingTime%`nat %DateUTCTargetLocal%.
-    }
-    else {
-        GuiControl,, VarCouponText, Newest Coupon Code could not be found.
+        GuiControl,, VarCouponText, Coupon Code: %couponCode%`n%description%`n%UntilDate%`n`nExpires in about %EndingTime%`nat %DateUTCTargetLocal%.
+        Break
+        }
     }
 }
 
@@ -555,7 +565,7 @@ CreateGui(){
 
     Gui, Tab, 3
     Gui, Add, Text, x7 y57 w300 h80 vVarCouponText,
-    Gui, Add, Button, x7 y150 w85 vVarGetCode gGetCode, Get Code
+    Gui, Add, Button, x7 y160 w85 vVarGetCode gGetCode, Get Code
 
     Gui, Tab, 4
     Gui, Add, ListView, vVarListViewTab4_2 -0x8 LV0x10000 Grid -Hdr 0x2000 R1 x0 y50 w300, 1|2
@@ -872,7 +882,7 @@ Get_InstanceID_address(mem,AddressBase,moduleBase){
 }
 
 Get_StaticTooltip_address(mem){
-        aPattern := mem.hexStringToPattern("F0 F6 ?? ?? F7 7F 00 00 A8 F9 ?? ?? F7 7F 00 00 70 F7 ?? ?? F7 7F 00 00 B0 F9 ?? ?? F7 7F 00 00 80 F7 ?? ?? F7 7F 00 00 B8 F9 ?? ?? F7 7F 00 00 08 F9 ?? ?? F7 7F 00 00 C0 F9 ?? ?? F7 7F 00 00 68 F9 ?? ?? F7 7F 00 00 C8 F9 ?? ?? F7 7F 00 00")
+    aPattern := mem.hexStringToPattern("F0 F6 ?? ?? ?? 7F 00 00 A8 F9 ?? ?? ?? 7F 00 00 70 F7 ?? ?? ?? 7F 00 00 B0 F9 ?? ?? ?? 7F 00 00 80 F7 ?? ?? ?? 7F 00 00 B8 F9 ?? ?? ?? 7F 00 00 08 F9 ?? ?? ?? 7F 00 00 C0 F9 ?? ?? ?? 7F 00 00 68 F9 ?? ?? ?? 7F 00 00 C8 F9 ?? ?? ?? 7F 00 00")
     StaticTooltip_address := mem.processPatternScan(,, aPattern*)
     If (StaticTooltip_address>0)
         StaticTooltip_addressBase := StaticTooltip_address + 0x74
