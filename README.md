@@ -34,7 +34,7 @@ Everything in **Graphics**, **Adv Graphics** and **Troubleshoot**.
 <br/><br/>
 
 #### Tested
-- LotRO Update 37.2.1 - Wednesday October 11, 2023
+- LotRO Update 38 - Wednesday November 8, 2023
 - Windows 10 22H2
 - 64-bit Client
 
