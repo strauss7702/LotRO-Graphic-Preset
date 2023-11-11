@@ -794,7 +794,7 @@ UpdateCoordinates:
     ServerNumber := mem.read(CurrentServer_AddressBase, "UShort")
     InstanceNumber := mem.read(AddressBase + moduleBase + 0x40F4, "UShort")
     RegionNumber := mem.read(AddressBase + moduleBase + 0x40EC, "UChar")
-    RegionNames := ["Eriador","Rhovanion","Gondor","Mordor"]
+    RegionNames := ["Eriador","Rhovanion","Gondor","Mordor","Haradwaith"]
 
     Gui, ListView, VarListViewTab4_1
     LV_modify(1, "Col2", RegionNumber > 0 ? RegionNames[RegionNumber] : "")
