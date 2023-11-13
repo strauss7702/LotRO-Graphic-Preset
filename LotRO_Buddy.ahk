@@ -959,10 +959,10 @@ AddressData.Push(["Volumetric_Sun_Lightning", 2458, "UChar", "IN", "0,1"]
                 ,["3D_Object_Portraits", 2554, "UChar", "IN", "0,1"]
                 ,["Texture_Cache_Size", 2556, "UFloat", "BETWEEN", , "0.0", "1.0"]
                 ,["Per_Pixel_Lightning_Attenuation", 2561, "UChar", "IN", "0,1"]
-                ,["Maximum_Frame_Rate", 4403840, "UShort", "BETWEEN", , "0", "1000"]
-                ,["Avatar_Texture_Compositing", 4469464, "UChar", "IN", "0,1"]
-                ,["Avatar_Update_Visible", 4469465, "UChar", "IN", "0,1"]
-                ,["PvMP_Performance_Override", 4469467, "UChar", "IN", "0,1"])
+                ,["Maximum_Frame_Rate", 4404464, "UShort", "BETWEEN", , "0", "1000"]
+                ,["Avatar_Texture_Compositing", 4470160, "UChar", "IN", "0,1"]
+                ,["Avatar_Update_Visible", 4470161, "UChar", "IN", "0,1"]
+                ,["PvMP_Performance_Override", 4470163, "UChar", "IN", "0,1"])
 
 InstanceNames := {}
 InstanceNames[0] := ["","",""]
