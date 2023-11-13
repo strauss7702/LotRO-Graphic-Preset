@@ -8,7 +8,7 @@ Coordmode, Mouse, Client
 OnExit("Cleanup")
 OnMessage(0x201, "WM_LBUTTONDOWN")
 OnMessage(0x202, "WM_LBUTTONUP")
-currentRelease := "0.4.9"
+currentRelease := "0.5.0"
 
 if !A_IsAdmin {
     Run *RunAs "%A_ScriptFullPath%"
@@ -99,22 +99,22 @@ Loop{
 }until (Address_WriteableCoords>0 || A_Index>=10)
 
 Loop{
-    Progress,,Server %A_Index%/10`nDo not move Character or Camera.
-    Progress, % 55 + A_Index
+    Progress,,Server %A_Index%/5`nDo not move Character or Camera.
+    Progress, % 55 + A_Index * 2
     CurrentServer_AddressBase:=Get_CurrentServer_address(mem)
-}until (CurrentServer_AddressBase>0 || A_Index>=10)
+}until (CurrentServer_AddressBase>0 || A_Index>=5)
 
 Loop{
-    Progress,,Instance %A_Index%/10`nDo not move Character or Camera.
-    Progress, % 70 + A_Index
+    Progress,,Instance %A_Index%/5`nDo not move Character or Camera.
+    Progress, % 70 + A_Index * 2
     InstanceID_addressBase:=Get_InstanceID_address(mem,AddressBase,moduleBase)
-}until (InstanceID_addressBase>0 || A_Index>=10)
+}until (InstanceID_addressBase>0 || A_Index>=5)
 
 Loop{
-    Progress,,ToolTip %A_Index%/10`nDo not move Character or Camera.
-    Progress, % 80 + A_Index
+    Progress,,ToolTip %A_Index%/5`nDo not move Character or Camera.
+    Progress, % 80 + A_Index * 2
     StaticTooltip_addressBase:=Get_StaticTooltip_address(mem)
-}until (StaticTooltip_addressBase>0 || A_Index>=10)
+}until (StaticTooltip_addressBase>0 || A_Index>=5)
 ClipBoard:=StaticTooltip_addressBase
 
 
